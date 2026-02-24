@@ -34,4 +34,12 @@
 
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
-@import '@ionic/angular/css/palettes/dark.system.css';
+/*@import '@ionic/angular/css/palettes/dark.system.css';*/
+ion-item.ion-invalid.ion-touched ion-input {
+    --color: var(--ion-color-danger);
+}
+
+ion-item.ion-invalid.ion-touched {
+    --highlight-color: var(--ion-color-danger);
+    --border-color: var(--ion-color-danger);
+}
