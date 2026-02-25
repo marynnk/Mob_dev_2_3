@@ -51,13 +51,13 @@ export class ItemsPage {
     }
 
     toggleTask(task: Task, slidingItem: IonItemSliding) {
-        this.tasksService.update(task.id, { completed: !task.completed })
+        this.tasksService.updateTask$(task, { completed: !task.completed })
             .pipe(takeUntilDestroyed(this.destroyRef))
             .subscribe(() => slidingItem.close());
     }
 
     deleteTask(task: Task, slidingItem: IonItemSliding) {
-        this.tasksService.removeItem$(t => t.id === task.id)
+        this.tasksService.removeItem$(task)
             .pipe(takeUntilDestroyed(this.destroyRef))
             .subscribe(() => slidingItem.close());
     }

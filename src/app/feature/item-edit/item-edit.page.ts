@@ -12,7 +12,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TaskService } from '../../core/services/task.service';
 import { Task } from '../../core/models/task.model';
-import { map } from 'rxjs';
+import { map, tap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
@@ -28,6 +28,7 @@ export class ItemEditPage {
     private fb = inject(FormBuilder);
     private activatedRoute = inject(ActivatedRoute);
     private tasksService = inject(TaskService);
+    private task: Task | null = null;
 
     form = this.getForm();
 
@@ -69,18 +70,21 @@ export class ItemEditPage {
         if (!this.isEdit) {
             this.form = this.getForm();
         } else {
-            this.tasksService.getItemById$(this.id!)
+            this.tasksService.getItem$(this.id!)
                 .pipe(takeUntilDestroyed(this.destroyRef))
-                .pipe(map(task => this.getForm(task)))
+                .pipe(
+                    tap(task => this.task = task),
+                    map(task => this.getForm(task))
+                )
                 .subscribe(form => this.form = form);
         }
     }
 
     saveAction() {
-        const { value: task } = this.form;
+        const taskData = this.form.getRawValue() as Task;
         const save$ = this.isEdit ?
-            this.tasksService.update(this.id!, task as Task) :
-            this.tasksService.addItem$(task as Task);
+            this.tasksService.updateTask$(this.task!, taskData) :
+            this.tasksService.addTask$(taskData);
         return save$.pipe(takeUntilDestroyed(this.destroyRef));
     }
 
