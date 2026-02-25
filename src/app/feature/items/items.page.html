@@ -1,42 +1,61 @@
-<ion-header [translucent]="true">
+<ion-header>
     <ion-toolbar>
-        <ion-title class="ion-text-center">ToDo List</ion-title>
+        <ion-title>Мої завдання</ion-title>
+        <ion-buttons slot="end">
+            <ion-button (click)="logout()" class="logout-btn">
+                <ion-icon slot="icon-only" name="log-out-outline"></ion-icon>
+            </ion-button>
+        </ion-buttons>
     </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-    <ion-list>
+    @if (items.length === 0) {
+        <div class="empty-state">
+            <img src="/assets/icon/empty-state.svg" alt="Empty state"/>
+            <p class="empty-title">Завдань ще немає</p>
+            <p class="empty-subtitle">Натисніть + щоб додати перше завдання</p>
+        </div>
+    }
+
+    <ion-list lines="none" class="task-list">
         @for (item of items; track item.id) {
-            <ion-item-sliding #slidingItem (click)="editTask(item)">
+            <ion-item-sliding #slidingItem>
+
                 @if (!item.completed) {
                     <ion-item-options side="start" (ionSwipe)="toggleTask(item, slidingItem)">
-                        <ion-item-option color="success" (click)="toggleTask(item, slidingItem); $event.stopPropagation()">Done</ion-item-option>
+                        <ion-item-option expandable (click)="toggleTask(item, slidingItem); $event.stopPropagation()">
+                            <ion-icon slot="icon-only" name="checkmark-circle"></ion-icon>
+                        </ion-item-option>
                     </ion-item-options>
                 }
 
-                <ion-item>
-                    @if (item.completed) {
-                        <ion-icon name="checkmark-circle" color="success"/>
-                    } @else {
-                        <ion-icon name="radio-button-off" color="warning"/>
-                    }
-                    <ion-label class="ion-padding-start">
+                <ion-item [class.task-done]="item.completed" (click)="editTask(item)" button detail="false">
+                    <div slot="start" class="status-dot" [class.done]="item.completed">
+                        <ion-icon [name]="item.completed ? 'checkmark-circle' : 'radio-button-off'"></ion-icon>
+                    </div>
+                    <ion-label>
                         <h3>{{ item.title }}</h3>
-                        <p>{{ item.description || 'Опис відсутній' }}</p>
+                        <p>{{ item.description || 'Без опису' }}</p>
                     </ion-label>
+                    <ion-icon slot="end" name="create-outline" class="edit-hint"></ion-icon>
                 </ion-item>
 
                 <ion-item-options side="end" (ionSwipe)="deleteTask(item, slidingItem)">
-                    <ion-item-option color="danger" (click)="deleteTask(item, slidingItem); $event.stopPropagation()">Delete</ion-item-option>
+                    <ion-item-option color="danger" expandable
+                                     (click)="deleteTask(item, slidingItem); $event.stopPropagation()">
+                        <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+                    </ion-item-option>
                 </ion-item-options>
+
             </ion-item-sliding>
         }
     </ion-list>
 
-
-    <ion-fab vertical="bottom" horizontal="end" slot="fixed" class="ion-padding">
-        <ion-fab-button (click)="addItem()">
-            <ion-icon name="add"/>
+    <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+        <ion-fab-button>
+            <ion-icon name="add" (click)="addItem()"></ion-icon>
         </ion-fab-button>
     </ion-fab>
+
 </ion-content>

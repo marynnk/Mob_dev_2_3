@@ -1,3 +1,160 @@
 <ion-content [fullscreen]="true">
+    <div class="auth-bg">
+        <div class="auth-card">
 
+            <img class="auth-logo" src="/assets/icon/register.svg"/>
+
+            <h1 class="auth-title">Реєстрація</h1>
+            <p class="auth-subtitle">Створіть свій акаунт</p>
+
+            <form [formGroup]="form" (ngSubmit)="onRegister()" novalidate>
+
+                <div class="field-group">
+                    <ion-input
+                        fill="outline"
+                        type="text"
+                        label="Імʼя користувача *"
+                        labelPlacement="stacked"
+                        autocomplete="username"
+                        placeholder="Ім'я користувача"
+                        formControlName="displayName"
+                        [errorText]="fieldError('displayName')"
+                        [class.ion-invalid]="controls.displayName.invalid && controls.displayName.touched"
+                        [class.ion-touched]="controls.displayName.touched"
+                    >
+                        <ion-icon slot="start" name="person-outline" aria-hidden="true"></ion-icon>
+                    </ion-input>
+                </div>
+
+                <div class="field-group">
+                    <ion-input
+                        fill="outline"
+                        type="email"
+                        label="Email *"
+                        labelPlacement="stacked"
+                        inputmode="email"
+                        autocomplete="email"
+                        placeholder="you@example.com"
+                        formControlName="email"
+                        [errorText]="fieldError('email')"
+                        [class.ion-invalid]="controls.email.invalid && controls.email.touched"
+                        [class.ion-touched]="controls.email.touched"
+                    >
+                        <ion-icon slot="start" name="mail-outline" aria-hidden="true"></ion-icon>
+                    </ion-input>
+                </div>
+
+                <div class="field-group">
+                    <ion-input
+                        fill="outline"
+                        [type]="showPassword ? 'text' : 'password'"
+                        label="Пароль *"
+                        labelPlacement="stacked"
+                        autocomplete="new-password"
+                        placeholder="Мін. 8 символів, 1 велика, 1 цифра"
+                        formControlName="password"
+                        [errorText]="fieldError('password')"
+                        [class.ion-invalid]="controls.password.invalid && controls.password.touched"
+                        [class.ion-touched]="controls.password.touched"
+                    >
+                        <ion-icon slot="start" name="lock-closed-outline" aria-hidden="true"></ion-icon>
+                        <ion-button slot="end" fill="clear" (click)="showPassword = !showPassword">
+                            <ion-icon slot="icon-only"
+                                      [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+                        </ion-button>
+                    </ion-input>
+                </div>
+
+                <div class="field-group">
+                    <ion-input
+                        fill="outline"
+                        [type]="showConfirm ? 'text' : 'password'"
+                        label="Підтвердження паролю *"
+                        labelPlacement="stacked"
+                        autocomplete="new-password"
+                        placeholder="Повторіть пароль"
+                        formControlName="confirmPassword"
+                        [errorText]="confirmMismatch ? 'Паролі не збігаються' : fieldError('confirmPassword')"
+                        [class.ion-invalid]="(controls.confirmPassword.invalid && controls.confirmPassword.touched) || confirmMismatch"
+                        [class.ion-touched]="controls.confirmPassword.touched"
+                    >
+                        <ion-icon slot="start" name="lock-closed-outline" aria-hidden="true"></ion-icon>
+                        <ion-button slot="end" fill="clear" (click)="showConfirm = !showConfirm">
+                            <ion-icon slot="icon-only"
+                                      [name]="showConfirm ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+                        </ion-button>
+                    </ion-input>
+                </div>
+
+                <div class="section-divider"><span>Додаткові дані</span></div>
+
+                <div class="field-group">
+                    <ion-input
+                        fill="outline"
+                        type="tel"
+                        label="Номер телефону"
+                        labelPlacement="stacked"
+                        inputmode="tel"
+                        autocomplete="tel"
+                        placeholder="+380 XX XXX XX XX"
+                        formControlName="phone"
+                        [errorText]="fieldError('phone')"
+                        [class.ion-invalid]="controls.phone.invalid && controls.phone.touched"
+                        [class.ion-touched]="controls.phone.touched"
+                    >
+                        <ion-icon slot="start" name="call-outline" aria-hidden="true"></ion-icon>
+                    </ion-input>
+                </div>
+
+                <div class="field-group">
+                    <ion-input
+                        fill="outline"
+                        type="date"
+                        label="Дата народження"
+                        labelPlacement="stacked"
+                        formControlName="dateOfBirth"
+                    >
+                        <ion-icon slot="start" name="calendar-outline" aria-hidden="true"></ion-icon>
+                    </ion-input>
+                </div>
+
+                <div class="field-group">
+                    <ion-textarea
+                        fill="outline"
+                        label="Про себе"
+                        labelPlacement="stacked"
+                        rows="3"
+                        [counter]="true"
+                        [maxlength]="200"
+                        placeholder="Розкажіть трохи про себе…"
+                        formControlName="bio"
+                        [errorText]="fieldError('bio')"
+                        [class.ion-invalid]="controls.bio.invalid && controls.bio.touched"
+                        [class.ion-touched]="controls.bio.touched"
+                    >
+                        <ion-icon slot="start" name="chatbubble-outline" aria-hidden="true"></ion-icon>
+                    </ion-textarea>
+                </div>
+
+                @if (error) {
+                    <div class="error-banner">{{ error }}</div>
+                }
+
+                <ion-button expand="block" type="submit" class="submit-btn" [disabled]="loading">
+                    @if (loading) {
+                        <ion-spinner name="crescent"></ion-spinner>
+                    } @else {
+                        Зареєструватися
+                    }
+                </ion-button>
+
+            </form>
+
+            <p class="auth-link">
+                Вже є акаунт?
+                <button type="button" class="link-btn" (click)="goToLogin()">Увійти</button>
+            </p>
+
+        </div>
+    </div>
 </ion-content>

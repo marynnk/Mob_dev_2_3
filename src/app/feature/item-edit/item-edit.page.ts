@@ -4,10 +4,10 @@ import {
     IonToolbar,
     IonTitle,
     IonContent,
-    IonButtons, IonBackButton, IonList, IonItem, IonInput, IonButton
+    IonButtons, IonBackButton, IonButton, IonIcon, IonInput, IonTextarea,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { add } from 'ionicons/icons';
+import { saveOutline } from 'ionicons/icons';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TaskService } from '../../core/services/task.service';
@@ -19,8 +19,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
     selector: 'app-edit-item',
     templateUrl: 'item-edit.page.html',
     styleUrls: ['item-edit.page.scss'],
-    imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonBackButton, IonList, IonItem, IonInput,
-        ReactiveFormsModule, IonButton],
+    imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonBackButton,
+        ReactiveFormsModule, IonButton, IonIcon, IonInput, IonTextarea],
 })
 export class ItemEditPage {
     private destroyRef = inject(DestroyRef);
@@ -32,9 +32,7 @@ export class ItemEditPage {
     form = this.getForm();
 
     constructor() {
-        addIcons({
-            add,
-        });
+        addIcons({ saveOutline });
     }
 
     get id() {
@@ -48,13 +46,23 @@ export class ItemEditPage {
     getForm(task?: Task | null) {
         return this.fb.group({
             title: [task?.title ?? '', [Validators.required, Validators.maxLength(100)]],
-            description: [task?.description ?? '', [Validators.maxLength(100)]]
-        })
+            description: [task?.description ?? '', [Validators.maxLength(100)]],
+        });
     }
 
     fieldInvalid(name: string) {
         const c = this.form.get(name);
         return !!c && c.invalid && c.dirty && c.touched;
+    }
+
+    fieldError(name: string): string {
+        const c = this.form.get(name);
+        if (!c) return '';
+        if (c.hasError('required')) return 'Поле є обовʼязковим';
+        if (c.hasError('maxlength')) {
+            return `Максимум ${c.errors?.['maxlength']?.requiredLength as number} символів`;
+        }
+        return '';
     }
 
     ionViewWillEnter() {

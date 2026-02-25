@@ -4,4 +4,6 @@ export interface Register {
     createdAt: unknown;
     displayName: string;
     phone?: string;
+    dateOfBirth?: string;
+    bio?: string;
 }

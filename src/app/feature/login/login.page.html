@@ -1,3 +1,69 @@
 <ion-content [fullscreen]="true">
+    <div class="auth-bg">
+        <div class="auth-card">
+            <img class="auth-logo" src="/assets/icon/login.svg"/>
+            <h1 class="auth-title">Вхід</h1>
+            <p class="auth-subtitle">Раді бачити вас знову!</p>
 
+            <form [formGroup]="form" (ngSubmit)="onLogin()" novalidate>
+                <div class="field-group">
+                    <ion-input
+                        fill="outline"
+                        type="email"
+                        label="Email *"
+                        labelPlacement="stacked"
+                        inputmode="email"
+                        autocomplete="email"
+                        placeholder="you@example.com"
+                        formControlName="email"
+                        [errorText]="emailError()"
+                        [class.ion-invalid]="email.invalid && email.touched"
+                        [class.ion-touched]="email.touched"
+                    >
+                        <ion-icon slot="start" name="mail-outline" aria-hidden="true"></ion-icon>
+                    </ion-input>
+                </div>
+
+                <div class="field-group">
+                    <ion-input
+                        fill="outline"
+                        [type]="showPassword ? 'text' : 'password'"
+                        label="Пароль *"
+                        labelPlacement="stacked"
+                        autocomplete="current-password"
+                        placeholder="Мін. 8 символів"
+                        formControlName="password"
+                        [errorText]="passwordError()"
+                        [class.ion-invalid]="password.invalid && password.touched"
+                        [class.ion-touched]="password.touched"
+                    >
+                        <ion-icon slot="start" name="lock-closed-outline" aria-hidden="true"></ion-icon>
+                        <ion-button slot="end" fill="clear" (click)="showPassword = !showPassword">
+                            <ion-icon slot="icon-only"
+                                      [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+                        </ion-button>
+                    </ion-input>
+                </div>
+
+                @if (error) {
+                    <div class="error-banner">{{ error }}</div>
+                }
+
+                <ion-button expand="block" type="submit" class="submit-btn" [disabled]="loading">
+                    @if (loading) {
+                        <ion-spinner name="crescent"></ion-spinner>
+                    } @else {
+                        Увійти
+                    }
+                </ion-button>
+
+            </form>
+
+            <p class="auth-link">
+                Немає акаунту?
+                <button type="button" class="link-btn" (click)="goToRegister()">Зареєструватися</button>
+            </p>
+
+        </div>
+    </div>
 </ion-content>

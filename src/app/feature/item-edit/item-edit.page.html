@@ -1,34 +1,55 @@
-<ion-header [translucent]="true">
+<ion-header>
     <ion-toolbar>
         <ion-buttons slot="start">
-            <ion-back-button/>
+            <ion-back-button defaultHref="/item"></ion-back-button>
         </ion-buttons>
-        <ion-title class="ion-text-center">{{ isEdit ? 'Edit item' : 'Add item' }}</ion-title>
+        <ion-title>{{ isEdit ? 'Редагування' : 'Нове завдання' }}</ion-title>
     </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="ion-padding-end ion-padding-top">
-    <form [formGroup]="form" (ngSubmit)="save()" class="ion-display-flex ion-flex-column">
-        <ion-list>
-            <ion-item>
-                <ion-input
-                    [class.ion-invalid]="fieldInvalid('title')"
-                    formControlName="title"
-                    label="Назва завдання*"
-                    labelPlacement="stacked"
-                    placeholder="Введіть назву"
-                    [maxlength]="100"/>
-            </ion-item>
-            <ion-item>
-                <ion-input
-                    [class.ion-invalid]="fieldInvalid('description')"
-                    formControlName="description"
-                    label="Опис завдання"
-                    labelPlacement="stacked"
-                    placeholder="Введіть опис"
-                    [maxlength]="100"/>
-            </ion-item>
-        </ion-list>
-        <ion-button type="submit" class="ion-align-self-end ion-margin-top">Зберегти</ion-button>
-    </form>
+<ion-content [fullscreen]="true">
+    <div class="page-bg">
+        <div class="form-card">
+            <form [formGroup]="form" (ngSubmit)="save()" novalidate>
+
+                <div class="field-group">
+                    <ion-input
+                        fill="outline"
+                        type="text"
+                        label="Назва завдання *"
+                        labelPlacement="stacked"
+                        placeholder="Введіть назву"
+                        [maxlength]="100"
+                        [counter]="true"
+                        formControlName="title"
+                        [errorText]="fieldError('title')"
+                        [class.ion-invalid]="fieldInvalid('title')"
+                        [class.ion-touched]="form.get('title')?.touched"
+                    ></ion-input>
+                </div>
+
+                <div class="field-group">
+                    <ion-textarea
+                        fill="outline"
+                        label="Опис завдання"
+                        labelPlacement="stacked"
+                        placeholder="Введіть опис (необовʼязково)"
+                        rows="4"
+                        [maxlength]="100"
+                        [counter]="true"
+                        formControlName="description"
+                        [errorText]="fieldError('description')"
+                        [class.ion-invalid]="fieldInvalid('description')"
+                        [class.ion-touched]="form.get('description')?.touched"
+                    ></ion-textarea>
+                </div>
+
+                <ion-button expand="block" type="submit" class="submit-btn">
+                    <ion-icon slot="start" name="save-outline"></ion-icon>
+                    Зберегти
+                </ion-button>
+
+            </form>
+        </div>
+    </div>
 </ion-content>
