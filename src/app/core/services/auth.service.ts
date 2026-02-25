@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
-import {Auth, authState} from '@angular/fire/auth';
+import { Auth, authState } from '@angular/fire/auth';
 import {
     User,
     browserLocalPersistence,
@@ -22,12 +22,12 @@ export class AuthService {
     private readonly firestore = inject(Firestore);
 
     readonly user$: Observable<User | null> = authState(this.auth).pipe(
-        shareReplay({ bufferSize: 1, refCount: true }),
+        shareReplay({ bufferSize: 1, refCount: false }),
     );
 
     readonly isLoggedIn$: Observable<boolean> = this.user$.pipe(
         map((u) => !!u),
-        shareReplay({ bufferSize: 1, refCount: true }),
+        shareReplay({ bufferSize: 1, refCount: false }),
     );
 
     constructor() {

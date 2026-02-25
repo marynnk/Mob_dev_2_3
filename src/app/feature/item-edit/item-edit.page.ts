@@ -12,7 +12,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TaskService } from '../../core/services/task.service';
 import { Task } from '../../core/models/task.model';
-import { map, tap } from 'rxjs';
+import { map, Subject, takeUntil, tap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
@@ -29,11 +29,16 @@ export class ItemEditPage {
     private activatedRoute = inject(ActivatedRoute);
     private tasksService = inject(TaskService);
     private task: Task | null = null;
+    private leaveSubject = new Subject<void>();
 
     form = this.getForm();
 
     constructor() {
         addIcons({ saveOutline });
+        this.destroyRef.onDestroy(() => {
+            this.leaveSubject.next();
+            this.leaveSubject.complete();
+        });
     }
 
     get id() {
@@ -69,15 +74,17 @@ export class ItemEditPage {
     ionViewWillEnter() {
         if (!this.isEdit) {
             this.form = this.getForm();
-        } else {
-            this.tasksService.getItem$(this.id!)
-                .pipe(takeUntilDestroyed(this.destroyRef))
-                .pipe(
-                    tap(task => this.task = task),
-                    map(task => this.getForm(task))
-                )
-                .subscribe(form => this.form = form);
+            return;
         }
+        this.tasksService.getItem$(this.id!).pipe(
+            takeUntil(this.leaveSubject),
+            tap(task => this.task = task),
+            map(task => this.getForm(task))
+        ).subscribe(form => this.form = form);
+    }
+
+    ionViewWillLeave() {
+        this.leaveSubject.next();
     }
 
     saveAction() {

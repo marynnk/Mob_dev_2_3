@@ -22,6 +22,7 @@ import {
     personOutline, callOutline, calendarOutline, chatbubbleOutline,
 } from 'ionicons/icons';
 import { AuthService } from '../../core/services/auth.service';
+import { filter, firstValueFrom } from 'rxjs';
 
 const passwordMatchValidator: ValidatorFn = (group: AbstractControl): ValidationErrors | null => {
     const password = group.get('password')?.value ?? '';
@@ -118,6 +119,7 @@ export class RegisterPage {
                 dateOfBirth: dateOfBirth || undefined,
                 bio: bio || undefined,
             });
+            await firstValueFrom(this.authService.user$.pipe(filter(u => !!u)));
             await this.router.navigate(['/item']);
         } catch (err: unknown) {
             this.error = this.mapError(err);

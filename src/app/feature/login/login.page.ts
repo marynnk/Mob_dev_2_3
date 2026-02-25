@@ -11,6 +11,7 @@ import {
 import { addIcons } from 'ionicons';
 import { eyeOutline, eyeOffOutline, mailOutline, lockClosedOutline } from 'ionicons/icons';
 import { AuthService } from '../../core/services/auth.service';
+import { filter, firstValueFrom } from 'rxjs';
 
 @Component({
     selector: 'app-login',
@@ -66,6 +67,7 @@ export class LoginPage {
         try {
             const { email, password } = this.form.getRawValue();
             await this.authService.login(email, password);
+            await firstValueFrom(this.authService.user$.pipe(filter(u => !!u)));
             await this.router.navigate(['/item']);
         } catch (err: unknown) {
             this.error = this.mapError(err);

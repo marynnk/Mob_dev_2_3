@@ -17,6 +17,7 @@ import { Task } from '../../core/models/task.model';
 import { TaskService } from '../../core/services/task.service';
 import { AuthService } from '../../core/services/auth.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { filter, firstValueFrom } from 'rxjs';
 
 @Component({
     selector: 'app-home',
@@ -47,7 +48,8 @@ export class ItemsPage {
 
     async logout() {
         await this.authService.logout();
-        await this.router.navigate(['/login']);
+        await firstValueFrom(this.authService.user$.pipe(filter(u => !u)));
+        this.router.navigate(['/login']);
     }
 
     toggleTask(task: Task, slidingItem: IonItemSliding) {
