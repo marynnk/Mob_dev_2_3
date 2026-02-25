@@ -6,6 +6,10 @@ import { AppComponent } from './app/app.component';
 import { importProvidersFrom } from '@angular/core';
 import { IonicStorageModule } from '@ionic/storage-angular';
 import { Drivers } from '@ionic/storage';
+import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
+import { environment } from './environments/environment';
+import { getFirestore, provideFirestore } from '@angular/fire/firestore';
+import { getAuth, provideAuth } from '@angular/fire/auth';
 
 bootstrapApplication(AppComponent, {
     providers: [
@@ -17,6 +21,9 @@ bootstrapApplication(AppComponent, {
                 name: 'todo_list',
                 driverOrder: [Drivers.IndexedDB, Drivers.LocalStorage]
             })
-        )
+        ),
+        provideFirebaseApp(() => initializeApp(environment.firebase)),
+        provideAuth(() => getAuth()),
+        provideFirestore(() => getFirestore()),
     ],
 });

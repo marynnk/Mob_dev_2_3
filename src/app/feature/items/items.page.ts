@@ -12,18 +12,18 @@ import {
 import { addIcons } from 'ionicons';
 import { add, checkmarkCircle, radioButtonOff } from 'ionicons/icons';
 import { Router } from '@angular/router';
-import { Task } from '../core/models/Task';
-import { TaskService } from '../core/services/task.service';
+import { Task } from '../../core/models/task.model';
+import { TaskService } from '../../core/services/task.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
     selector: 'app-home',
-    templateUrl: 'home.page.html',
-    styleUrls: ['home.page.scss'],
+    templateUrl: 'items.page.html',
+    styleUrls: ['items.page.scss'],
     imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonFab, IonFabButton, IonIcon, IonList, IonItemSliding,
         IonItem, IonLabel, IonItemOptions, IonItemOption],
 })
-export class HomePage {
+export class ItemsPage {
     private destroyRef = inject(DestroyRef);
     private router = inject(Router);
     private tasksService = inject(TaskService);
@@ -43,7 +43,7 @@ export class HomePage {
     }
 
     addItem() {
-        this.router.navigate(['/item']);
+        this.router.navigate(['/item/add']);
     }
 
     toggleTask(task: Task, slidingItem: IonItemSliding) {

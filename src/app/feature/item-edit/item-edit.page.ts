@@ -10,25 +10,24 @@ import { addIcons } from 'ionicons';
 import { add } from 'ionicons/icons';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { TaskService } from '../core/services/task.service';
-import { Task } from '../core/models/Task';
+import { TaskService } from '../../core/services/task.service';
+import { Task } from '../../core/models/task.model';
 import { map } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
     selector: 'app-edit-item',
-    templateUrl: 'edit-item.page.html',
-    styleUrls: ['edit-item.page.scss'],
+    templateUrl: 'item-edit.page.html',
+    styleUrls: ['item-edit.page.scss'],
     imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonBackButton, IonList, IonItem, IonInput,
         ReactiveFormsModule, IonButton],
 })
-export class EditItemPage {
+export class ItemEditPage {
     private destroyRef = inject(DestroyRef);
     private router = inject(Router);
     private fb = inject(FormBuilder);
     private activatedRoute = inject(ActivatedRoute);
     private tasksService = inject(TaskService);
-    private task: Task = {} as Task;
 
     form = this.getForm();
 

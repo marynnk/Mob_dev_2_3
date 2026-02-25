@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { Storage } from '@ionic/storage-angular';
 import { BehaviorSubject, from, map, Observable, shareReplay, switchMap, take, tap } from 'rxjs';
-import {Task} from '../models/Task';
+import {Task} from '../models/task.model';
 
 @Injectable({
     providedIn: 'root',
