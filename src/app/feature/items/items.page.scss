@@ -1,6 +1,12 @@
 ion-header ion-toolbar {
     --padding-start: 4px;
     --padding-end: 4px;
+    .user-name {
+        max-width: 90px;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
 }
 
 .logout-btn {

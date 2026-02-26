@@ -18,6 +18,8 @@ import { TaskService } from '../../core/services/task.service';
 import { AuthService } from '../../core/services/auth.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { filter, firstValueFrom } from 'rxjs';
+import { Profile } from '../../core/models/profile.model';
+import { AccountService } from '../../core/services/account.service';
 
 @Component({
     selector: 'app-home',
@@ -29,10 +31,12 @@ import { filter, firstValueFrom } from 'rxjs';
 export class ItemsPage {
     private destroyRef = inject(DestroyRef);
     private router = inject(Router);
-    private tasksService = inject(TaskService);
     private authService = inject(AuthService);
+    private tasksService = inject(TaskService);
+    private accountService = inject(AccountService);
 
     items: Array<Task> = [];
+    account: Profile | null = null;
 
     constructor() {
         addIcons({ add, checkmarkCircle, radioButtonOff, logOutOutline, trashOutline, createOutline });
@@ -40,6 +44,10 @@ export class ItemsPage {
         this.tasksService.getItems$()
             .pipe(takeUntilDestroyed(this.destroyRef))
             .subscribe(items => this.items = items);
+
+        this.accountService.getAccount$()
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe(account => this.account = account);
     }
 
     addItem() {

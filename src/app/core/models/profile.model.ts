@@ -1,5 +1,5 @@
-export interface Register {
-    uid: string;
+export interface Profile {
+    uid?: string;
     email: string;
     createdAt: unknown;
     displayName: string;

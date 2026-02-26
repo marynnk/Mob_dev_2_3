@@ -9,15 +9,13 @@ import {
     signOut,
     updateProfile,
 } from 'firebase/auth';
-import { Firestore, doc, serverTimestamp, setDoc } from '@angular/fire/firestore';
-import { Register } from '../models/register.model';
+import { Profile } from '../models/profile.model';
 
 @Injectable({
     providedIn: 'root',
 })
 export class AuthService {
     private readonly auth = inject(Auth);
-    private readonly firestore = inject(Firestore);
 
     readonly user$: Observable<User | null> = authState(this.auth).pipe(
         shareReplay({ bufferSize: 1, refCount: false }),
@@ -37,20 +35,12 @@ export class AuthService {
         await signOut(this.auth);
     }
 
-    async register(email: string, password: string, extra: Omit<Register, 'uid'>): Promise<User> {
+    async register(email: string, password: string, extra: Omit<Profile, 'uid'>): Promise<User> {
         const cred = await createUserWithEmailAndPassword(this.auth, email, password);
 
         if (extra.displayName?.trim()) {
             await updateProfile(cred.user, { displayName: extra.displayName.trim() });
         }
-
-        const registerData: Register = {
-            ...extra,
-            email,
-            uid: cred.user.uid,
-            createdAt: serverTimestamp(),
-        };
-        await setDoc(doc(this.firestore, 'users', cred.user.uid), registerData, { merge: true });
         return cred.user;
     }
 }

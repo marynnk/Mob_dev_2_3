@@ -1,6 +1,7 @@
 <ion-header>
     <ion-toolbar>
         <ion-title>Мої завдання</ion-title>
+        <ion-label class="user-name" slot="end"><strong>{{ account?.displayName }}</strong></ion-label>
         <ion-buttons slot="end">
             <ion-button (click)="logout()" class="logout-btn">
                 <ion-icon slot="icon-only" name="log-out-outline"></ion-icon>

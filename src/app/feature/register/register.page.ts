@@ -23,6 +23,8 @@ import {
 } from 'ionicons/icons';
 import { AuthService } from '../../core/services/auth.service';
 import { filter, firstValueFrom } from 'rxjs';
+import { AccountService } from '../../core/services/account.service';
+import { Profile } from '../../core/models/profile.model';
 
 const passwordMatchValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
     const parent = control.parent;
@@ -46,6 +48,7 @@ export class RegisterPage {
     private readonly fb = inject(FormBuilder);
     private readonly router = inject(Router);
     private readonly authService = inject(AuthService);
+    private readonly accountService = inject(AccountService);
 
     loading = false;
     error = '';
@@ -108,11 +111,6 @@ export class RegisterPage {
         return '';
     }
 
-    get confirmMismatch(): boolean {
-        const { confirmPassword } = this.controls;
-        return this.form.hasError('passwordMismatch') && (confirmPassword.touched || confirmPassword.dirty);
-    }
-
     async onRegister(): Promise<void> {
         if (this.form.invalid) {
             this.form.markAllAsTouched();
@@ -122,17 +120,20 @@ export class RegisterPage {
         this.error = '';
         try {
             const { email, password, displayName, phone, dateOfBirth, bio } = this.form.getRawValue();
-            await this.authService.register(email, password, {
+            const registerData: Profile = {
                 email,
                 createdAt: null,
                 displayName,
-                phone: phone || undefined,
-                dateOfBirth: dateOfBirth || undefined,
-                bio: bio || undefined,
-            });
+                phone: phone || '',
+                dateOfBirth: dateOfBirth || '',
+                bio: bio || '',
+            };
+            const user = await this.authService.register(email, password, registerData);
+            await firstValueFrom(this.accountService.addProfile$(registerData, user));
             await firstValueFrom(this.authService.user$.pipe(filter(u => !!u)));
             await this.router.navigate(['/item']);
         } catch (err: unknown) {
+            debugger;
             this.error = this.mapError(err);
         } finally {
             this.loading = false;
