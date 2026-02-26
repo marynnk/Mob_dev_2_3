@@ -94,11 +94,11 @@ ion-content {
     color: var(--app-card-bg);
     background: linear-gradient(to bottom right, var(--app-primary-light) 0, var(--app-primary-dark)) 100%;
     border-radius: 50%;
-    padding: 12px;
+    padding: 15px;
     filter: drop-shadow(0 4px 16px rgba(108, 99, 255, 0.25));
     ion-icon {
-        width: 60px;
-        height: 60px;
+        width: 45px;
+        height: 45px;
     }
 }
 

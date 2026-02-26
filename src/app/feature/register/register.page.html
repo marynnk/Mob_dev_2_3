@@ -76,9 +76,9 @@
                         autocomplete="new-password"
                         placeholder="Повторіть пароль"
                         formControlName="confirmPassword"
-                        [errorText]="confirmMismatch ? 'Паролі не збігаються' : fieldError('confirmPassword')"
-                        [class.ion-invalid]="(controls.confirmPassword.invalid && controls.confirmPassword.touched) || confirmMismatch"
-                        [class.ion-touched]="controls.confirmPassword.touched"
+                        [errorText]="fieldError('confirmPassword')"
+                        [class.ion-invalid]="(controls.confirmPassword.invalid && (controls.confirmPassword.touched || controls.confirmPassword.dirty))"
+                        [class.ion-touched]="controls.confirmPassword.touched || controls.confirmPassword.dirty"
                     >
                         <ion-icon slot="start" name="lock-closed-outline" aria-hidden="true"></ion-icon>
                         <ion-button slot="end" fill="clear" (click)="showConfirm = !showConfirm">

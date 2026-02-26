@@ -24,10 +24,16 @@ import {
 import { AuthService } from '../../core/services/auth.service';
 import { filter, firstValueFrom } from 'rxjs';
 
-const passwordMatchValidator: ValidatorFn = (group: AbstractControl): ValidationErrors | null => {
-    const password = group.get('password')?.value ?? '';
-    const confirm = group.get('confirmPassword')?.value ?? '';
-    return password && confirm && password !== confirm ? { passwordMismatch: true } : null;
+const passwordMatchValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
+    const parent = control.parent;
+    if (!parent) return null;
+
+    const password = parent.get('password')?.value ?? '';
+    const confirm = control.value ?? '';
+
+    if (!password || !confirm) return null;
+
+    return password !== confirm ? { passwordMismatch: true } : null;
 };
 
 @Component({
@@ -54,12 +60,11 @@ export class RegisterPage {
                 Validators.minLength(8),
                 Validators.pattern(/^(?=.*[A-Z])(?=.*\d).+$/),
             ]],
-            confirmPassword: ['', Validators.required],
+            confirmPassword: ['', [Validators.required, passwordMatchValidator]],
             phone: ['', Validators.pattern(/^\+?[0-9\s\-]{7,15}$/)],
             dateOfBirth: [''],
             bio: ['', Validators.maxLength(200)],
         },
-        { validators: passwordMatchValidator },
     );
 
     constructor() {
@@ -73,6 +78,9 @@ export class RegisterPage {
             calendarOutline,
             chatbubbleOutline,
             personAddOutline
+        });
+        this.controls.password.valueChanges.subscribe(() => {
+            this.controls.confirmPassword.updateValueAndValidity({ onlySelf: true });
         });
     }
 
@@ -96,11 +104,13 @@ export class RegisterPage {
             if (field === 'password') return 'Потрібна велика літера та цифра';
             if (field === 'phone') return 'Невірний формат номера';
         }
+        if (ctrl.hasError('passwordMismatch')) return 'Паролі не збігаються';
         return '';
     }
 
     get confirmMismatch(): boolean {
-        return this.form.hasError('passwordMismatch') && this.controls.confirmPassword.touched;
+        const { confirmPassword } = this.controls;
+        return this.form.hasError('passwordMismatch') && (confirmPassword.touched || confirmPassword.dirty);
     }
 
     async onRegister(): Promise<void> {
