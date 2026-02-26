@@ -4,9 +4,7 @@ import { map, shareReplay } from 'rxjs/operators';
 import { Auth, authState } from '@angular/fire/auth';
 import {
     User,
-    browserLocalPersistence,
     createUserWithEmailAndPassword,
-    setPersistence,
     signInWithEmailAndPassword,
     signOut,
     updateProfile,
@@ -29,10 +27,6 @@ export class AuthService {
         map((u) => !!u),
         shareReplay({ bufferSize: 1, refCount: false }),
     );
-
-    constructor() {
-        void setPersistence(this.auth, browserLocalPersistence);
-    }
 
     async login(email: string, password: string): Promise<User> {
         const cred = await signInWithEmailAndPassword(this.auth, email, password);
