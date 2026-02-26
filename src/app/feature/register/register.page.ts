@@ -19,7 +19,7 @@ import {
 import { addIcons } from 'ionicons';
 import {
     eyeOutline, eyeOffOutline, mailOutline, lockClosedOutline,
-    personOutline, callOutline, calendarOutline, chatbubbleOutline,
+    personOutline, callOutline, calendarOutline, chatbubbleOutline, personAddOutline,
 } from 'ionicons/icons';
 import { AuthService } from '../../core/services/auth.service';
 import { filter, firstValueFrom } from 'rxjs';
@@ -71,7 +71,8 @@ export class RegisterPage {
             personOutline,
             callOutline,
             calendarOutline,
-            chatbubbleOutline
+            chatbubbleOutline,
+            personAddOutline
         });
     }
 

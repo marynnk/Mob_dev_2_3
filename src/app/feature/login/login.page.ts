@@ -9,7 +9,7 @@ import {
     IonSpinner,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { eyeOutline, eyeOffOutline, mailOutline, lockClosedOutline } from 'ionicons/icons';
+import { eyeOutline, eyeOffOutline, mailOutline, lockClosedOutline, enterOutline } from 'ionicons/icons';
 import { AuthService } from '../../core/services/auth.service';
 import { filter, firstValueFrom } from 'rxjs';
 
@@ -34,7 +34,7 @@ export class LoginPage {
     });
 
     constructor() {
-        addIcons({ eyeOutline, eyeOffOutline, mailOutline, lockClosedOutline });
+        addIcons({ eyeOutline, eyeOffOutline, mailOutline, lockClosedOutline, enterOutline });
     }
 
     get email() {
