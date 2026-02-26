@@ -1,25 +1,34 @@
 import { Component, DestroyRef, inject } from '@angular/core';
 import {
-    IonHeader,
-    IonToolbar,
-    IonTitle,
+    IonButton,
+    IonButtons,
     IonContent,
     IonFab,
     IonFabButton,
+    IonHeader,
     IonIcon,
-    IonList, IonItemSliding, IonItem, IonLabel, IonItemOptions, IonItemOption,
-    IonButton, IonButtons,
+    IonItem,
+    IonItemOption,
+    IonItemOptions,
+    IonItemSliding,
+    IonLabel,
+    IonList,
+    IonTitle,
+    IonToolbar,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { add, checkmarkCircle, radioButtonOff, logOutOutline, trashOutline, createOutline } from 'ionicons/icons';
+import { add, checkmarkCircle, createOutline, logOutOutline, radioButtonOff, trashOutline } from 'ionicons/icons';
 import { Router } from '@angular/router';
 import { Task } from '../../core/models/task.model';
 import { TaskService } from '../../core/services/task.service';
 import { AuthService } from '../../core/services/auth.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { filter, firstValueFrom } from 'rxjs';
+import { filter, firstValueFrom, from, map, switchMap, tap } from 'rxjs';
 import { Profile } from '../../core/models/profile.model';
 import { AccountService } from '../../core/services/account.service';
+import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
+import { ActionSheet, ActionSheetButtonStyle } from '@capacitor/action-sheet';
+import index from 'eslint-plugin-jsdoc';
 
 @Component({
     selector: 'app-home',
@@ -61,15 +70,37 @@ export class ItemsPage {
     }
 
     toggleTask(task: Task, slidingItem: IonItemSliding) {
-        this.tasksService.updateTask$(task, { completed: !task.completed })
-            .pipe(takeUntilDestroyed(this.destroyRef))
-            .subscribe(() => slidingItem.close());
+        this.tasksService.updateTask$(task, { completed: !task.completed }).pipe(
+            takeUntilDestroyed(this.destroyRef),
+            tap(() => Haptics.notification({ type: NotificationType.Success }))
+        ).subscribe(() => slidingItem.close());
+    }
+
+    confirmTaskDeletion(task: Task) {
+        return from(Haptics.notification({ type: NotificationType.Error })).pipe(
+            switchMap(() => ActionSheet.showActions({
+                title: 'Дійсно видалити задачу?',
+                message: task.title,
+                options: [
+                    { title: 'Ні', },
+                    {
+                        title: 'Так',
+                        style: ActionSheetButtonStyle.Destructive,
+                    },
+                ],
+            })),
+            map(({ index }) => index === 1)
+        )
     }
 
     deleteTask(task: Task, slidingItem: IonItemSliding) {
-        this.tasksService.removeItem$(task)
-            .pipe(takeUntilDestroyed(this.destroyRef))
-            .subscribe(() => slidingItem.close());
+        slidingItem.close();
+        this.confirmTaskDeletion(task).pipe(
+            takeUntilDestroyed(this.destroyRef),
+            filter(Boolean),
+            switchMap(() => this.tasksService.removeItem$(task)),
+            switchMap(() => from(Haptics.notification({ type: NotificationType.Success })))
+        ).subscribe();
     }
 
     editTask(task: Task) {
