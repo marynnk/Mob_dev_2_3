@@ -14,7 +14,7 @@ import {
     IonIcon,
     IonInput,
     IonTextarea,
-    IonSpinner,
+    IonSpinner, IonInputPasswordToggle,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -42,7 +42,8 @@ const passwordMatchValidator: ValidatorFn = (control: AbstractControl): Validati
     selector: 'app-register',
     templateUrl: 'register.page.html',
     styleUrls: ['register.page.scss'],
-    imports: [IonContent, IonButton, IonIcon, IonInput, IonTextarea, IonSpinner, ReactiveFormsModule],
+    imports: [IonContent, IonButton, IonIcon, IonInput, IonTextarea, IonSpinner, ReactiveFormsModule,
+        IonInputPasswordToggle],
 })
 export class RegisterPage {
     private readonly fb = inject(FormBuilder);
@@ -52,8 +53,6 @@ export class RegisterPage {
 
     loading = false;
     error = '';
-    showPassword = false;
-    showConfirm = false;
 
     readonly form = this.fb.nonNullable.group({
             displayName: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(30)]],
