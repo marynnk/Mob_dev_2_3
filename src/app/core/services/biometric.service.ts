@@ -1,12 +1,13 @@
 import { inject, Injectable, signal } from '@angular/core';
-import { EMPTY, Observable, Subject, from, merge, of } from 'rxjs';
-import { catchError, exhaustMap, filter, switchMap, take, tap } from 'rxjs/operators';
+import { EMPTY, Observable, Subject, from, firstValueFrom } from 'rxjs';
+import { catchError, exhaustMap, tap } from 'rxjs/operators';
 import {
     BiometricAuth,
     BiometryError,
     BiometryErrorType,
-    CheckBiometryResult,
 } from '@aparajita/capacitor-biometric-auth';
+import { App } from '@capacitor/app';
+import { PrivacyScreen } from '@capacitor/privacy-screen';
 import { Auth } from '@angular/fire/auth';
 import { AuthService } from './auth.service';
 
@@ -18,22 +19,29 @@ export class BiometricService {
     readonly isLocked = signal(false);
 
     private failureCount = 0;
-    private readonly MAX_FAILURES = 5;
-    private cooldownUntil = 0;
-    private readonly COOLDOWN_MS = 2000;
-
+    private readonly MAX_FAILURES = 2;
     private readonly retrySubject = new Subject<void>();
 
     init(): void {
-        from(BiometricAuth.checkBiometry()).pipe(
-            catchError(() => EMPTY),
-            switchMap(() => merge(
-                of(null),
-                this.resumeEvents$().pipe(filter((i) => i.isAvailable)),
-                this.retrySubject,
-            )),
-            filter(() => Date.now() >= this.cooldownUntil),
-            exhaustMap(() => this.lockAndAuthIfLoggedIn$()),
+        this.lockIfLoggedIn();
+        PrivacyScreen.enable({
+            android: {
+                dimBackground: true,
+                privacyModeOnActivityHidden: 'splash'
+            },
+            ios: {
+                blurEffect: 'light'
+            }
+        });
+
+        App.addListener('appStateChange', async ({ isActive }) => {
+            if (!isActive) {
+                await this.lockIfLoggedIn();
+            }
+        });
+
+        this.retrySubject.pipe(
+            exhaustMap(() => this.authenticate$()),
         ).subscribe();
     }
 
@@ -41,37 +49,12 @@ export class BiometricService {
         this.retrySubject.next();
     }
 
-    private resumeEvents$(): Observable<CheckBiometryResult> {
-        return new Observable<CheckBiometryResult>((subscriber) => {
-            let handle: Awaited<ReturnType<typeof BiometricAuth.addResumeListener>>;
-
-            BiometricAuth.addResumeListener((info) => subscriber.next(info))
-                .then((h) => {
-                    handle = h;
-                });
-
-            return () => void handle?.remove();
-        });
-    }
-
-    private lockAndAuthIfLoggedIn$(): Observable<void> {
-        this.isLocked.set(true);
-
-        return from(this.auth.authStateReady()).pipe(
-            switchMap(() => this.authService.isLoggedIn$.pipe(take(1))),
-            switchMap((isLoggedIn) => {
-                if (!isLoggedIn) {
-                    this.isLocked.set(false);
-                    return EMPTY;
-                }
-                return this.authenticate$();
-            }),
-            catchError((e) => {
-                this.isLocked.set(false);
-                console.error('[BiometricService]', e);
-                return EMPTY;
-            }),
-        );
+    private async lockIfLoggedIn(): Promise<void> {
+        await this.auth.authStateReady();
+        const isLoggedIn = await firstValueFrom(this.authService.isLoggedIn$);
+        if (isLoggedIn) {
+            this.isLocked.set(true);
+        }
     }
 
     private authenticate$(): Observable<void> {
@@ -83,7 +66,6 @@ export class BiometricService {
         ).pipe(
             tap(() => {
                 this.failureCount = 0;
-                this.cooldownUntil = Date.now() + this.COOLDOWN_MS;
                 this.isLocked.set(false);
             }),
             catchError((error) => {
@@ -93,7 +75,10 @@ export class BiometricService {
                 }
 
                 switch (error.code) {
-                    case BiometryErrorType.authenticationFailed: {
+                    case BiometryErrorType.authenticationFailed:
+                    case BiometryErrorType.userCancel:
+                    case BiometryErrorType.systemCancel:
+                    case BiometryErrorType.appCancel: {
                         this.failureCount++;
                         if (this.failureCount >= this.MAX_FAILURES) {
                             this.failureCount = 0;
@@ -108,11 +93,6 @@ export class BiometricService {
                         this.isLocked.set(false);
                         return from(this.authService.logout());
                     }
-
-                    case BiometryErrorType.userCancel:
-                    case BiometryErrorType.systemCancel:
-                    case BiometryErrorType.appCancel:
-                        return EMPTY;
 
                     default:
                         this.isLocked.set(false);

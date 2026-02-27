@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { filter, firstValueFrom, Observable } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
 import { Auth, authState } from '@angular/fire/auth';
 import {
@@ -10,12 +10,14 @@ import {
     updateProfile,
 } from 'firebase/auth';
 import { Profile } from '../models/profile.model';
+import { Router } from '@angular/router';
 
 @Injectable({
     providedIn: 'root',
 })
 export class AuthService {
     private readonly auth = inject(Auth);
+    private router = inject(Router);
 
     readonly user$: Observable<User | null> = authState(this.auth).pipe(
         shareReplay({ bufferSize: 1, refCount: false }),
@@ -33,6 +35,8 @@ export class AuthService {
 
     async logout(): Promise<void> {
         await signOut(this.auth);
+        await firstValueFrom(this.user$.pipe(filter(u => !u)));
+        await this.router.navigate(['/login']);
     }
 
     async register(email: string, password: string, extra: Omit<Profile, 'uid'>): Promise<User> {
