@@ -1,3 +1,13 @@
 <ion-app>
-  <ion-router-outlet></ion-router-outlet>
+  <ion-router-outlet />
+
+  @if (biometricService.isLocked()) {
+    <div class="lock-screen">
+      <ion-icon name="lock-closed-outline" class="lock-screen__icon" />
+      <p class="lock-screen__title">Додаток заблоковано</p>
+      <ion-button (click)="retry()" expand="block" class="lock-screen__button">
+        Увійти через Face ID / Touch ID
+      </ion-button>
+    </div>
+  }
 </ion-app>

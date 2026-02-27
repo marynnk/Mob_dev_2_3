@@ -26,9 +26,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { filter, firstValueFrom, from, map, switchMap, tap } from 'rxjs';
 import { Profile } from '../../core/models/profile.model';
 import { AccountService } from '../../core/services/account.service';
-import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
+import { Haptics, NotificationType } from '@capacitor/haptics';
 import { ActionSheet, ActionSheetButtonStyle } from '@capacitor/action-sheet';
-import index from 'eslint-plugin-jsdoc';
 
 @Component({
     selector: 'app-home',
