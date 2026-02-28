@@ -29,7 +29,6 @@
                 <div class="field-group">
                     <ion-input
                         fill="outline"
-                        [type]="showPassword ? 'text' : 'password'"
                         label="Пароль *"
                         labelPlacement="stacked"
                         autocomplete="current-password"
@@ -40,10 +39,7 @@
                         [class.ion-touched]="password.touched"
                     >
                         <ion-icon slot="start" name="lock-closed-outline" aria-hidden="true"></ion-icon>
-                        <ion-button slot="end" fill="clear" (click)="showPassword = !showPassword">
-                            <ion-icon slot="icon-only"
-                                      [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
-                        </ion-button>
+                        <ion-input-password-toggle slot="end" hide-icon="eye-off-outline" show-icon="eye-outline"/>
                     </ion-input>
                 </div>
 

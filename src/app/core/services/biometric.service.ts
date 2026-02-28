@@ -1,12 +1,13 @@
 import { inject, Injectable, signal } from '@angular/core';
-import { EMPTY, Observable, Subject, from, firstValueFrom } from 'rxjs';
-import { catchError, exhaustMap, tap } from 'rxjs/operators';
+import { EMPTY, Observable, Subject, from, merge, of } from 'rxjs';
+import { catchError, exhaustMap, map, switchMap, take, tap } from 'rxjs/operators';
 import {
     BiometricAuth,
     BiometryError,
     BiometryErrorType,
 } from '@aparajita/capacitor-biometric-auth';
 import { App } from '@capacitor/app';
+import type { PluginListenerHandle } from '@capacitor/core';
 import { PrivacyScreen } from '@capacitor/privacy-screen';
 import { Auth } from '@angular/fire/auth';
 import { AuthService } from './auth.service';
@@ -23,25 +24,19 @@ export class BiometricService {
     private readonly retrySubject = new Subject<void>();
 
     init(): void {
-        this.lockIfLoggedIn();
         PrivacyScreen.enable({
-            android: {
-                dimBackground: true,
-                privacyModeOnActivityHidden: 'splash'
-            },
-            ios: {
-                blurEffect: 'light'
-            }
+            android: { dimBackground: true, privacyModeOnActivityHidden: 'splash' },
+            ios: { blurEffect: 'light' },
         });
 
-        App.addListener('appStateChange', async ({ isActive }) => {
-            if (!isActive) {
-                await this.lockIfLoggedIn();
-            }
-        });
-
-        this.retrySubject.pipe(
-            exhaustMap(() => this.authenticate$()),
+        merge(
+            of('lock' as const),
+            this.appInactive$().pipe(map(() => 'lock' as const)),
+            this.retrySubject.pipe(map(() => 'auth' as const)),
+        ).pipe(
+            exhaustMap((action) =>
+                action === 'lock' ? this.lockIfLoggedIn$() : this.authenticate$()
+            ),
         ).subscribe();
     }
 
@@ -49,12 +44,27 @@ export class BiometricService {
         this.retrySubject.next();
     }
 
-    private async lockIfLoggedIn(): Promise<void> {
-        await this.auth.authStateReady();
-        const isLoggedIn = await firstValueFrom(this.authService.isLoggedIn$);
-        if (isLoggedIn) {
-            this.isLocked.set(true);
-        }
+    private appInactive$(): Observable<void> {
+        return new Observable<void>((subscriber) => {
+            let handle: PluginListenerHandle | undefined;
+
+            App.addListener('appStateChange', ({ isActive }) => {
+                if (!isActive) subscriber.next();
+            }).then((h) => { handle = h; });
+
+            return () => void handle?.remove();
+        });
+    }
+
+    private lockIfLoggedIn$(): Observable<void> {
+        return from(this.auth.authStateReady()).pipe(
+            switchMap(() => this.authService.isLoggedIn$.pipe(take(1))),
+            tap((isLoggedIn) => {
+                if (isLoggedIn) this.isLocked.set(true);
+            }),
+            map(() => void 0),
+            catchError(() => EMPTY),
+        );
     }
 
     private authenticate$(): Observable<void> {
