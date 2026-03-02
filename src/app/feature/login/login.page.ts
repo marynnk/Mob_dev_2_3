@@ -79,6 +79,10 @@ export class LoginPage {
         void this.router.navigate(['/register']);
     }
 
+    goToForgotPassword(): void {
+        void this.router.navigate(['/forgot-password']);
+    }
+
     private mapError(err: unknown): string {
         const code = (err as { code?: string })?.code ?? '';
         if (code.includes('user-not-found') || code.includes('wrong-password') || code.includes('invalid-credential')) {
