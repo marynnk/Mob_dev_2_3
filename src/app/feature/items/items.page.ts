@@ -1,23 +1,20 @@
 import { Component, DestroyRef, inject } from '@angular/core';
 import {
-    IonButton,
     IonButtons,
     IonContent,
     IonFab,
     IonFabButton,
     IonHeader,
     IonIcon,
-    IonLabel,
     IonList,
     IonTitle,
     IonToolbar,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { add, logOutOutline } from 'ionicons/icons';
+import { add } from 'ionicons/icons';
 import { Router } from '@angular/router';
 import { Task } from '../../core/models/task.model';
 import { TaskService } from '../../core/services/task.service';
-import { AuthService } from '../../core/services/auth.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { filter, from, map, switchMap } from 'rxjs';
 import { Profile } from '../../core/models/profile.model';
@@ -26,17 +23,17 @@ import { Haptics, NotificationType } from '@capacitor/haptics';
 import { ActionSheet, ActionSheetButtonStyle } from '@capacitor/action-sheet';
 import { TaskItemComponent } from '../../shared/task-item/task-item.component';
 import { NotificationService } from '../../core/services/notification.service';
+import { UserMenuComponent } from '../../shared/user-menu/user-menu.component';
 
 @Component({
     selector: 'app-home',
     templateUrl: 'items.page.html',
     styleUrls: ['items.page.scss'],
-    imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonFab, IonFabButton, IonIcon, IonList, IonLabel, IonButton, IonButtons, TaskItemComponent],
+    imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonFab, IonFabButton, IonIcon, IonList, IonButtons, TaskItemComponent, UserMenuComponent],
 })
 export class ItemsPage {
     private destroyRef = inject(DestroyRef);
     private router = inject(Router);
-    private authService = inject(AuthService);
     private tasksService = inject(TaskService);
     private accountService = inject(AccountService);
     private notificationService = inject(NotificationService);
@@ -45,7 +42,7 @@ export class ItemsPage {
     account: Profile | null = null;
 
     constructor() {
-        addIcons({ add, logOutOutline });
+        addIcons({ add });
 
         this.tasksService.getItems$()
             .pipe(takeUntilDestroyed(this.destroyRef))
@@ -58,10 +55,6 @@ export class ItemsPage {
 
     addItem() {
         this.router.navigate(['/item/add']);
-    }
-
-    async logout() {
-        await this.authService.logout();
     }
 
     toggleTask(task: Task) {

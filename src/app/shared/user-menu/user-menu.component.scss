@@ -1,0 +1,42 @@
+.avatar-btn {
+    --padding-start: 8px;
+    --padding-end: 12px;
+}
+
+.avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--ion-color-primary);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0;
+    user-select: none;
+}
+
+.user-info {
+    padding: 16px 16px 10px;
+    border-bottom: 1px solid var(--ion-color-light);
+
+    .user-name {
+        margin: 0 0 4px;
+        font-weight: 600;
+        font-size: 15px;
+        color: var(--app-text);
+    }
+
+    .user-email {
+        margin: 0;
+        font-size: 13px;
+        color: var(--app-text-muted);
+    }
+}
+
+.logout-item {
+    --color: var(--ion-color-danger);
+    margin-top: 4px;
+}

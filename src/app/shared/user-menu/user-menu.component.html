@@ -1,0 +1,18 @@
+<ion-button id="user-menu-trigger" fill="clear" class="avatar-btn">
+    <div class="avatar">{{ initials }}</div>
+</ion-button>
+
+<ion-popover trigger="user-menu-trigger" trigger-action="click">
+    <ng-template>
+        <div class="user-info">
+            <p class="user-name">{{ account?.displayName }}</p>
+            <p class="user-email">{{ account?.email }}</p>
+        </div>
+        <ion-list lines="none">
+            <ion-item button (click)="logout()" class="logout-item">
+                <ion-icon slot="start" name="log-out-outline"></ion-icon>
+                <ion-label>Вийти</ion-label>
+            </ion-item>
+        </ion-list>
+    </ng-template>
+</ion-popover>
