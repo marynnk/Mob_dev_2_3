@@ -24,12 +24,24 @@ import { ActionSheet, ActionSheetButtonStyle } from '@capacitor/action-sheet';
 import { TaskItemComponent } from '../../shared/task-item/task-item.component';
 import { NotificationService } from '../../core/services/notification.service';
 import { UserMenuComponent } from '../../shared/user-menu/user-menu.component';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-home',
     templateUrl: 'items.page.html',
     styleUrls: ['items.page.scss'],
-    imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonFab, IonFabButton, IonIcon, IonList, IonButtons, TaskItemComponent, UserMenuComponent],
+    imports: [IonHeader,
+        IonToolbar,
+        IonTitle,
+        IonContent,
+        IonFab,
+        IonFabButton,
+        IonIcon,
+        IonList,
+        IonButtons,
+        TaskItemComponent,
+        UserMenuComponent,
+        TranslatePipe],
 })
 export class ItemsPage {
     private destroyRef = inject(DestroyRef);

@@ -11,6 +11,7 @@ import { NotificationService } from './core/services/notification.service';
 import { TaskService } from './core/services/task.service';
 import { map, switchMap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-root',
@@ -25,9 +26,13 @@ export class AppComponent implements OnInit {
     private readonly notificationService = inject(NotificationService);
     private readonly taskService = inject(TaskService);
     private readonly destroyRef = inject(DestroyRef);
+    private translate = inject(TranslateService);
 
     constructor() {
         addIcons({ lockClosedOutline, globeOutline });
+        this.translate.addLangs(['uk', 'en']);
+        this.translate.setFallbackLang('en');
+        this.translate.use('uk');
     }
 
     ngOnInit(): void {

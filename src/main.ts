@@ -10,8 +10,11 @@ import { getStorage, provideStorage } from '@angular/fire/storage';
 import { provideAuth } from '@angular/fire/auth';
 import { getApp } from 'firebase/app';
 import { initializeAuth, indexedDBLocalPersistence } from 'firebase/auth';
+import { provideTranslateService } from '@ngx-translate/core';
+import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
+import { provideHttpClient } from '@angular/common/http';
 
-bootstrapApplication(AppComponent, {
+void bootstrapApplication(AppComponent, {
     providers: [
         { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
         provideIonicAngular(),
@@ -22,5 +25,14 @@ bootstrapApplication(AppComponent, {
         })),
         provideFirestore(() => getFirestore()),
         provideStorage(() => getStorage()),
+        provideHttpClient(),
+        provideTranslateService({
+            loader: provideTranslateHttpLoader({
+                prefix: '/assets/locales/',
+                suffix: '.json'
+            }),
+            fallbackLang: 'en',
+            lang: 'uk'
+        }),
     ],
 });
