@@ -1,0 +1,37 @@
+<ion-item-sliding #slidingItem>
+
+    @if (!item.completed) {
+        <ion-item-options side="start" (ionSwipe)="handleToggleTask(item, slidingItem)">
+            <ion-item-option expandable (click)="handleToggleTask(item, slidingItem); $event.stopPropagation()">
+                <ion-icon slot="icon-only" name="checkmark-circle"></ion-icon>
+            </ion-item-option>
+        </ion-item-options>
+    }
+
+    <ion-item [class.task-done]="item.completed" [class.overdue]="isOverdue(item)" (click)="handleEditTask(item)" button detail="false">
+        <div slot="start" class="status-dot" [class.done]="item.completed">
+            <ion-icon [name]="item.completed ? 'checkmark-circle' : 'radio-button-off'"></ion-icon>
+        </div>
+        <ion-label>
+            <div class="ion-display-flex ion-align-items-center ion-justify-content-between">
+                <h3>{{ item.title }}</h3>
+                @if(item.dueDate) {
+                    <p class="due-date">{{ item.dueDate | date: 'dd.MM.yyyy HH:mm' }}</p>
+                }
+                @if (item.photos?.length) {
+                    <p class="photo-count">Зображень: {{item.photos?.length}}</p>
+                }
+            </div>
+            <p>{{ item.description || 'Без опису' }}</p>
+        </ion-label>
+        <ion-icon slot="end" name="create-outline" class="edit-hint"></ion-icon>
+    </ion-item>
+
+    <ion-item-options side="end" (ionSwipe)="handleDeleteTask(item, slidingItem)">
+        <ion-item-option color="danger" expandable
+                         (click)="handleDeleteTask(item, slidingItem); $event.stopPropagation()">
+            <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+        </ion-item-option>
+    </ion-item-options>
+
+</ion-item-sliding>

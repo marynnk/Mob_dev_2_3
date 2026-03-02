@@ -7,35 +7,30 @@ import {
     IonFabButton,
     IonHeader,
     IonIcon,
-    IonItem,
-    IonItemOption,
-    IonItemOptions,
-    IonItemSliding,
     IonLabel,
     IonList,
     IonTitle,
     IonToolbar,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { add, checkmarkCircle, createOutline, logOutOutline, radioButtonOff, trashOutline } from 'ionicons/icons';
+import { add, logOutOutline } from 'ionicons/icons';
 import { Router } from '@angular/router';
 import { Task } from '../../core/models/task.model';
 import { TaskService } from '../../core/services/task.service';
 import { AuthService } from '../../core/services/auth.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { filter, from, map, switchMap, tap } from 'rxjs';
+import { filter, from, map, switchMap } from 'rxjs';
 import { Profile } from '../../core/models/profile.model';
 import { AccountService } from '../../core/services/account.service';
 import { Haptics, NotificationType } from '@capacitor/haptics';
 import { ActionSheet, ActionSheetButtonStyle } from '@capacitor/action-sheet';
-import { DatePipe } from '@angular/common';
+import { TaskItemComponent } from '../../shared/task-item/task-item.component';
 
 @Component({
     selector: 'app-home',
     templateUrl: 'items.page.html',
     styleUrls: ['items.page.scss'],
-    imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonFab, IonFabButton, IonIcon, IonList, IonItemSliding,
-        IonItem, IonLabel, IonItemOptions, IonItemOption, IonButton, IonButtons, DatePipe],
+    imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonFab, IonFabButton, IonIcon, IonList, IonLabel, IonButton, IonButtons, TaskItemComponent],
 })
 export class ItemsPage {
     private destroyRef = inject(DestroyRef);
@@ -48,7 +43,7 @@ export class ItemsPage {
     account: Profile | null = null;
 
     constructor() {
-        addIcons({ add, checkmarkCircle, radioButtonOff, logOutOutline, trashOutline, createOutline });
+        addIcons({ add, logOutOutline });
 
         this.tasksService.getItems$()
             .pipe(takeUntilDestroyed(this.destroyRef))
@@ -67,11 +62,10 @@ export class ItemsPage {
         await this.authService.logout();
     }
 
-    toggleTask(task: Task, slidingItem: IonItemSliding) {
+    toggleTask(task: Task) {
         this.tasksService.updateTask$(task, { completed: !task.completed }).pipe(
             takeUntilDestroyed(this.destroyRef),
-            tap(() => Haptics.notification({ type: NotificationType.Success }))
-        ).subscribe(() => slidingItem.close());
+        ).subscribe(() => Haptics.notification({ type: NotificationType.Success }));
     }
 
     confirmTaskDeletion(task: Task) {
@@ -91,21 +85,15 @@ export class ItemsPage {
         )
     }
 
-    deleteTask(task: Task, slidingItem: IonItemSliding) {
-        slidingItem.close();
+    deleteTask(task: Task) {
         this.confirmTaskDeletion(task).pipe(
             takeUntilDestroyed(this.destroyRef),
             filter(Boolean),
             switchMap(() => this.tasksService.removeItem$(task)),
-            switchMap(() => from(Haptics.notification({ type: NotificationType.Success })))
-        ).subscribe();
+        ).subscribe(() => Haptics.notification({ type: NotificationType.Success }));
     }
 
     editTask(task: Task) {
         this.router.navigate(['/item', task.id]);
-    }
-
-    protected isOverdue(item: Task) {
-        return item.dueDate && new Date(item.dueDate) < new Date();
     }
 }

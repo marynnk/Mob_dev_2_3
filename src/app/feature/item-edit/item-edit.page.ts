@@ -4,25 +4,33 @@ import {
     IonToolbar,
     IonTitle,
     IonContent,
-    IonButtons, IonBackButton, IonButton, IonIcon, IonInput, IonTextarea, IonSpinner, IonModal,
+    IonButtons, IonBackButton, IonButton, IonIcon, IonInput, IonTextarea, IonSpinner,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { cameraOutline, close, closeCircle, saveOutline } from 'ionicons/icons';
+import { saveOutline } from 'ionicons/icons';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
+import {
+    AbstractControl,
+    FormBuilder,
+    ReactiveFormsModule,
+    ValidationErrors,
+    ValidatorFn,
+    Validators
+} from '@angular/forms';
 import { TaskService } from '../../core/services/task.service';
 import { Task, TaskPhoto } from '../../core/models/task.model';
 import { catchError, forkJoin, from, map, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
-import { ActionSheet, ActionSheetButtonStyle } from '@capacitor/action-sheet';
+import { PhotoGridComponent } from '../../shared/photo-grid/photo-grid.component';
+import { PhotoViewComponent } from '../../shared/photo-view/photo-view.component';
 
 @Component({
     selector: 'app-edit-item',
     templateUrl: 'item-edit.page.html',
     styleUrls: ['item-edit.page.scss'],
     imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonBackButton,
-        ReactiveFormsModule, IonButton, IonIcon, IonInput, IonTextarea, IonSpinner, IonModal],
+        ReactiveFormsModule, IonButton, IonIcon, IonInput, IonTextarea, IonSpinner, PhotoGridComponent,
+        PhotoViewComponent],
 })
 export class ItemEditPage {
     private destroyRef = inject(DestroyRef);
@@ -42,7 +50,7 @@ export class ItemEditPage {
     private photosInitialized = false;
 
     constructor() {
-        addIcons({ saveOutline, cameraOutline, closeCircle, close });
+        addIcons({ saveOutline });
         this.destroyRef.onDestroy(() => {
             this.leaveSubject.next();
             this.leaveSubject.complete();
@@ -108,42 +116,16 @@ export class ItemEditPage {
         this.leaveSubject.next();
     }
 
-    async pickPhoto() {
-        const result = await ActionSheet.showActions({
-            title: 'Додати фото',
-            options: [
-                { title: 'Камера' },
-                { title: 'Галерея' },
-                { title: 'Скасувати', style: ActionSheetButtonStyle.Cancel },
-            ],
-        });
-
-        if (result.index === 2) return;
-
-        const source = result.index === 0 ? CameraSource.Camera : CameraSource.Photos;
-
-        try {
-            const image = await Camera.getPhoto({
-                quality: 30,
-                allowEditing: false,
-                resultType: CameraResultType.Uri,
-                source,
-            });
-
-            if (image.webPath) {
-                this.pendingPhotos.push({ webPath: image.webPath, preview: image.webPath });
-            }
-        } catch {
-
-        }
-    }
-
     openPhoto(url: string) {
         this.selectedPhotoUrl = url;
     }
 
-    closePhoto() {
-        this.selectedPhotoUrl = null;
+    addPhoto(path: string) {
+        this.pendingPhotos.push({ webPath: path, preview: path });
+    }
+
+    removePendingPhoto(index: number) {
+        this.pendingPhotos.splice(index, 1);
     }
 
     removeExistingPhoto(photo: TaskPhoto) {
@@ -151,8 +133,8 @@ export class ItemEditPage {
         this.deletedPhotoPaths.push(photo.storagePath);
     }
 
-    removePendingPhoto(index: number) {
-        this.pendingPhotos.splice(index, 1);
+    closePhoto() {
+        this.selectedPhotoUrl = null;
     }
 
     save() {
