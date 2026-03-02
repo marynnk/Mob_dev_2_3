@@ -121,6 +121,12 @@ ion-item {
         right: 10px;
     }
 
+    .photo-count {
+        position: absolute;
+        bottom: -10px;
+        right: 10px;
+    }
+
     &:not(.task-done) .due-date {
         color: var(--ion-color-primary-tint);
     }

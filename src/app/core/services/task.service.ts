@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { BehaviorSubject, catchError, from, map, Observable, of, switchMap, take, tap, throwError } from 'rxjs';
-import { Task } from '../models/task.model';
+import { Task, TaskPhoto } from '../models/task.model';
 import {
     collection,
     collectionData,
@@ -12,6 +12,7 @@ import {
     setDoc,
     where,
 } from '@angular/fire/firestore';
+import { deleteObject, getDownloadURL, ref, Storage, uploadBytes } from '@angular/fire/storage';
 import { AuthService } from './auth.service';
 import { User } from 'firebase/auth';
 
@@ -21,6 +22,7 @@ import { User } from 'firebase/auth';
 export class TaskService {
     private readonly collection = 'tasks';
     private readonly firestore = inject(Firestore);
+    private readonly storage = inject(Storage);
     private readonly authService = inject(AuthService);
 
     private items$ = new BehaviorSubject<Task[]>([]);
@@ -76,11 +78,11 @@ export class TaskService {
     }
 
     addTask$(item: Partial<Task>): Observable<Array<Task>> {
-        const task = { completed: false, ...item, id: Date.now(), createdAt: serverTimestamp() } as Task;
+        const task = { id: Date.now(), completed: false, ...item, createdAt: serverTimestamp() } as Task;
         return this.items$.pipe(
             take(1),
             switchMap(items => {
-                const updated = [task, ...items];
+                const updated = [task, ...items.filter(i => i.id !== task.id)];
                 return this.upsertTask(task).pipe(
                     tap(() => this.items$.next(updated)),
                     map(() => updated)
@@ -117,6 +119,31 @@ export class TaskService {
                     })
                 );
             })
+        );
+    }
+
+    uploadPhoto$(taskId: number, blob: Blob): Observable<TaskPhoto> {
+        return this.authService.user$.pipe(
+            take(1),
+            switchMap(user => {
+                const storagePath = `tasks/${taskId}/${user!.uid}/${Date.now()}.jpg`;
+                const storageRef = ref(this.storage, storagePath);
+                return from(uploadBytes(storageRef, blob, { contentType: blob.type || 'image/jpeg' })).pipe(
+                    switchMap(() => from(getDownloadURL(storageRef))),
+                    map(url => ({
+                        url,
+                        uploadedAt: new Date().toISOString(),
+                        storagePath,
+                    } as TaskPhoto))
+                );
+            })
+        );
+    }
+
+    deletePhoto$(storagePath: string): Observable<void> {
+        const storageRef = ref(this.storage, storagePath);
+        return from(deleteObject(storageRef)).pipe(
+            catchError(() => of(undefined))
         );
     }
 }

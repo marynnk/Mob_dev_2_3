@@ -58,8 +58,42 @@
                     ></ion-textarea>
                 </div>
 
-                <ion-button expand="block" type="submit" class="submit-btn">
-                    <ion-icon slot="start" name="save-outline"></ion-icon>
+                <div class="field-group photos">
+                    <div class="photos-label">Фотографії</div>
+                    <div class="photos-grid">
+
+                        @for (photo of photos; track photo.storagePath) {
+                            <div class="photo-item">
+                                <img [src]="photo.url" alt="Фото" (click)="openPhoto(photo.url)" />
+                                <button type="button" class="photo-remove" (click)="removeExistingPhoto(photo)">
+                                    <ion-icon name="close-circle"></ion-icon>
+                                </button>
+                            </div>
+                        }
+
+                        @for (photo of pendingPhotos; track $index) {
+                            <div class="photo-item photo-pending">
+                                <img [src]="photo.preview" alt="Фото" (click)="openPhoto(photo.preview)" />
+                                <button type="button" class="photo-remove" (click)="removePendingPhoto($index)">
+                                    <ion-icon name="close-circle"></ion-icon>
+                                </button>
+                            </div>
+                        }
+
+                        <button type="button" class="photo-add" (click)="pickPhoto()">
+                            <ion-icon name="camera-outline"></ion-icon>
+                            <span>Додати</span>
+                        </button>
+
+                    </div>
+                </div>
+
+                <ion-button expand="block" type="submit" class="submit-btn" [disabled]="isSaving">
+                    @if (isSaving) {
+                        <ion-spinner name="crescent" slot="start"></ion-spinner>
+                    } @else {
+                        <ion-icon slot="start" name="save-outline"></ion-icon>
+                    }
                     Зберегти
                 </ion-button>
 
@@ -67,3 +101,27 @@
         </div>
     </div>
 </ion-content>
+
+<ion-modal
+    [isOpen]="!!selectedPhotoUrl"
+    [backdropDismiss]="true"
+    (didDismiss)="closePhoto()"
+    class="photo-viewer-modal"
+>
+    <ng-template>
+        <ion-header>
+            <ion-toolbar>
+                <ion-buttons slot="end">
+                    <ion-button (click)="closePhoto()">
+                        <ion-icon slot="icon-only" name="close"></ion-icon>
+                    </ion-button>
+                </ion-buttons>
+            </ion-toolbar>
+        </ion-header>
+        <ion-content>
+            <div class="photo-viewer-wrap">
+                <img [src]="selectedPhotoUrl" class="photo-viewer-img" alt="Фото" />
+            </div>
+        </ion-content>
+    </ng-template>
+</ion-modal>

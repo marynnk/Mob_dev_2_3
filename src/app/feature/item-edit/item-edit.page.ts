@@ -4,23 +4,25 @@ import {
     IonToolbar,
     IonTitle,
     IonContent,
-    IonButtons, IonBackButton, IonButton, IonIcon, IonInput, IonTextarea,
+    IonButtons, IonBackButton, IonButton, IonIcon, IonInput, IonTextarea, IonSpinner, IonModal,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { saveOutline } from 'ionicons/icons';
+import { cameraOutline, close, closeCircle, saveOutline } from 'ionicons/icons';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { TaskService } from '../../core/services/task.service';
-import { Task } from '../../core/models/task.model';
-import { map, Subject, takeUntil, tap } from 'rxjs';
+import { Task, TaskPhoto } from '../../core/models/task.model';
+import { catchError, forkJoin, from, map, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
+import { ActionSheet, ActionSheetButtonStyle } from '@capacitor/action-sheet';
 
 @Component({
     selector: 'app-edit-item',
     templateUrl: 'item-edit.page.html',
     styleUrls: ['item-edit.page.scss'],
     imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonBackButton,
-        ReactiveFormsModule, IonButton, IonIcon, IonInput, IonTextarea],
+        ReactiveFormsModule, IonButton, IonIcon, IonInput, IonTextarea, IonSpinner, IonModal],
 })
 export class ItemEditPage {
     private destroyRef = inject(DestroyRef);
@@ -32,9 +34,15 @@ export class ItemEditPage {
     private leaveSubject = new Subject<void>();
 
     form = this.getForm();
+    photos: TaskPhoto[] = [];
+    pendingPhotos: { webPath: string; preview: string }[] = [];
+    deletedPhotoPaths: string[] = [];
+    isSaving = false;
+    selectedPhotoUrl: string | null = null;
+    private photosInitialized = false;
 
     constructor() {
-        addIcons({ saveOutline });
+        addIcons({ saveOutline, cameraOutline, closeCircle, close });
         this.destroyRef.onDestroy(() => {
             this.leaveSubject.next();
             this.leaveSubject.complete();
@@ -73,13 +81,25 @@ export class ItemEditPage {
     }
 
     ionViewWillEnter() {
+        this.pendingPhotos = [];
+        this.deletedPhotoPaths = [];
+        this.selectedPhotoUrl = null;
+        this.photosInitialized = false;
+
         if (!this.isEdit) {
+            this.photos = [];
             this.form = this.getForm();
             return;
         }
         this.tasksService.getItem$(this.id!).pipe(
             takeUntil(this.leaveSubject),
-            tap(task => this.task = task),
+            tap(task => {
+                this.task = task;
+                if (!this.photosInitialized) {
+                    this.photos = task?.photos ?? [];
+                    this.photosInitialized = true;
+                }
+            }),
             map(task => this.getForm(task))
         ).subscribe(form => this.form = form);
     }
@@ -88,21 +108,99 @@ export class ItemEditPage {
         this.leaveSubject.next();
     }
 
-    saveAction() {
-        const taskData = this.form.getRawValue() as Task;
-        const save$ = this.isEdit ?
-            this.tasksService.updateTask$(this.task!, taskData) :
-            this.tasksService.addTask$(taskData);
-        return save$.pipe(takeUntilDestroyed(this.destroyRef));
+    async pickPhoto() {
+        const result = await ActionSheet.showActions({
+            title: 'Додати фото',
+            options: [
+                { title: 'Камера' },
+                { title: 'Галерея' },
+                { title: 'Скасувати', style: ActionSheetButtonStyle.Cancel },
+            ],
+        });
+
+        if (result.index === 2) return;
+
+        const source = result.index === 0 ? CameraSource.Camera : CameraSource.Photos;
+
+        try {
+            const image = await Camera.getPhoto({
+                quality: 30,
+                allowEditing: false,
+                resultType: CameraResultType.Uri,
+                source,
+            });
+
+            if (image.webPath) {
+                this.pendingPhotos.push({ webPath: image.webPath, preview: image.webPath });
+            }
+        } catch {
+
+        }
+    }
+
+    openPhoto(url: string) {
+        this.selectedPhotoUrl = url;
+    }
+
+    closePhoto() {
+        this.selectedPhotoUrl = null;
+    }
+
+    removeExistingPhoto(photo: TaskPhoto) {
+        this.photos = this.photos.filter(p => p.storagePath !== photo.storagePath);
+        this.deletedPhotoPaths.push(photo.storagePath);
+    }
+
+    removePendingPhoto(index: number) {
+        this.pendingPhotos.splice(index, 1);
     }
 
     save() {
-        if (this.form.valid) {
-            this.saveAction()
-                .subscribe(() => this.router.navigate(['']));
-        } else {
+        if (!this.form.valid) {
             this.form.markAllAsTouched();
+            return;
         }
+
+        this.isSaving = true;
+        const taskId = this.isEdit ? this.task!.id : Date.now();
+
+        const upload$ = this.pendingPhotos.length > 0
+            ? forkJoin(this.pendingPhotos.map(p =>
+                from(fetch(p.webPath)).pipe(
+                    switchMap(r => from(r.blob())),
+                    switchMap(blob => this.tasksService.uploadPhoto$(taskId, blob))
+                )
+            ))
+            : of([] as TaskPhoto[]);
+
+        const delete$ = this.deletedPhotoPaths.length > 0
+            ? forkJoin(this.deletedPhotoPaths.map(path => this.tasksService.deletePhoto$(path)))
+            : of([]);
+
+        forkJoin([upload$, delete$]).pipe(
+            takeUntilDestroyed(this.destroyRef),
+            switchMap(([newPhotos]) => {
+                const allPhotos = [...this.photos, ...newPhotos];
+                const taskData = {
+                    ...this.form.getRawValue() as unknown as Task,
+                    photos: allPhotos,
+                    id: taskId,
+                };
+                const save$ = this.isEdit
+                    ? this.tasksService.updateTask$(this.task!, taskData)
+                    : this.tasksService.addTask$(taskData);
+                return save$;
+            }),
+            catchError(err => {
+                console.error('Save failed:', err);
+                this.isSaving = false;
+                return of(null);
+            })
+        ).subscribe(result => {
+            if (result !== null) {
+                this.router.navigate(['']);
+            }
+        });
     }
 
     get minDate(): string {

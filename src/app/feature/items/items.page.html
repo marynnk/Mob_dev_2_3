@@ -41,6 +41,9 @@
                             @if(item.dueDate) {
                                 <p class="due-date">{{ item.dueDate | date: 'dd.MM.yyyy HH:mm' }}</p>
                             }
+                            @if (item.photos?.length) {
+                                <p class="photo-count">Зображень: {{item.photos?.length}}</p>
+                            }
                         </div>
                         <p>{{ item.description || 'Без опису' }}</p>
                     </ion-label>

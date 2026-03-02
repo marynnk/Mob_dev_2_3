@@ -6,6 +6,7 @@ import { AppComponent } from './app/app.component';
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { environment } from './environments/environment';
 import { getFirestore, provideFirestore } from '@angular/fire/firestore';
+import { getStorage, provideStorage } from '@angular/fire/storage';
 import { provideAuth } from '@angular/fire/auth';
 import { getApp } from 'firebase/app';
 import { initializeAuth, indexedDBLocalPersistence } from 'firebase/auth';
@@ -20,5 +21,6 @@ bootstrapApplication(AppComponent, {
             persistence: indexedDBLocalPersistence,
         })),
         provideFirestore(() => getFirestore()),
+        provideStorage(() => getStorage()),
     ],
 });
