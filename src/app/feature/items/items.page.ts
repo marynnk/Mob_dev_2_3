@@ -28,13 +28,14 @@ import { Profile } from '../../core/models/profile.model';
 import { AccountService } from '../../core/services/account.service';
 import { Haptics, NotificationType } from '@capacitor/haptics';
 import { ActionSheet, ActionSheetButtonStyle } from '@capacitor/action-sheet';
+import { DatePipe } from '@angular/common';
 
 @Component({
     selector: 'app-home',
     templateUrl: 'items.page.html',
     styleUrls: ['items.page.scss'],
     imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonFab, IonFabButton, IonIcon, IonList, IonItemSliding,
-        IonItem, IonLabel, IonItemOptions, IonItemOption, IonButton, IonButtons],
+        IonItem, IonLabel, IonItemOptions, IonItemOption, IonButton, IonButtons, DatePipe],
 })
 export class ItemsPage {
     private destroyRef = inject(DestroyRef);
@@ -102,5 +103,9 @@ export class ItemsPage {
 
     editTask(task: Task) {
         this.router.navigate(['/item', task.id]);
+    }
+
+    protected isOverdue(item: Task) {
+        return item.dueDate && new Date(item.dueDate) < new Date();
     }
 }

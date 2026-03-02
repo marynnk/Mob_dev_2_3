@@ -9,7 +9,7 @@ import {
 import { addIcons } from 'ionicons';
 import { saveOutline } from 'ionicons/icons';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { TaskService } from '../../core/services/task.service';
 import { Task } from '../../core/models/task.model';
 import { map, Subject, takeUntil, tap } from 'rxjs';
@@ -52,6 +52,7 @@ export class ItemEditPage {
     getForm(task?: Task | null) {
         return this.fb.group({
             title: [task?.title ?? '', [Validators.required, Validators.maxLength(100)]],
+            dueDate: [task?.dueDate ?? '', [Validators.required, this.futureDateValidator()]],
             description: [task?.description ?? '', [Validators.maxLength(100)]],
         });
     }
@@ -102,5 +103,19 @@ export class ItemEditPage {
         } else {
             this.form.markAllAsTouched();
         }
+    }
+
+    get minDate(): string {
+        return new Date().toISOString().slice(0, 16);
+    }
+
+    private futureDateValidator(): ValidatorFn {
+        return (control: AbstractControl): ValidationErrors | null => {
+            if (!control.value) return null;
+            const selected = new Date(control.value);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            return selected >= today ? null : { pastDate: true };
+        };
     }
 }

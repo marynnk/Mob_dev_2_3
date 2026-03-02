@@ -77,9 +77,15 @@ ion-item {
     --min-height: 58px;
     --padding-start: 12px;
     --padding-end: 10px;
-    --padding-top: 6px;
-    --padding-bottom: 6px;
+    --padding-top: 12px;
+    --padding-bottom: 12px;
     cursor: pointer;
+
+    ion-label {
+        position: relative;
+        padding-right: 10px;
+        padding-left: 10px;
+    }
 
     &.task-done {
         --background: #f8f9ff;
@@ -107,6 +113,20 @@ ion-item {
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+    }
+
+    .due-date {
+        position: absolute;
+        top: -15px;
+        right: 10px;
+    }
+
+    &:not(.task-done) .due-date {
+        color: var(--ion-color-primary-tint);
+    }
+
+    &.overdue:not(.task-done) .due-date {
+        color: var(--ion-color-danger-tint);
     }
 }
 
