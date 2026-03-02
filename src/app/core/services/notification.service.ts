@@ -6,6 +6,9 @@ import { Task } from '../models/task.model';
 
 @Injectable({ providedIn: 'root' })
 export class NotificationService {
+    private hourMilliseconds = 1000 * 60 * 60;
+    private notifyHoursBefore = 1 * this.hourMilliseconds;
+
     private notificationId(taskId: number): number {
         return Math.abs(taskId % 2147483647);
     }
@@ -24,14 +27,14 @@ export class NotificationService {
                 if (task.completed || !task.dueDate) {
                     return of(undefined);
                 }
-                const at = new Date(task.dueDate);
+                const at = new Date(new Date(task.dueDate).getTime() - this.notifyHoursBefore);
                 if (at <= new Date()) {
                     return of(undefined);
                 }
                 return from(LocalNotifications.schedule({
                     notifications: [{
                         id,
-                        title: task.title,
+                        title: `Завдання "${task.title}" збігає за ${this.notifyHoursBefore / this.hourMilliseconds} годин(у)`,
                         body: task.description ?? 'Завдання очікує на виконання',
                         schedule: { at },
                     }],
