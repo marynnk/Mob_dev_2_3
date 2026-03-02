@@ -25,6 +25,7 @@ import { AccountService } from '../../core/services/account.service';
 import { Haptics, NotificationType } from '@capacitor/haptics';
 import { ActionSheet, ActionSheetButtonStyle } from '@capacitor/action-sheet';
 import { TaskItemComponent } from '../../shared/task-item/task-item.component';
+import { NotificationService } from '../../core/services/notification.service';
 
 @Component({
     selector: 'app-home',
@@ -38,6 +39,7 @@ export class ItemsPage {
     private authService = inject(AuthService);
     private tasksService = inject(TaskService);
     private accountService = inject(AccountService);
+    private notificationService = inject(NotificationService);
 
     items: Array<Task> = [];
     account: Profile | null = null;
@@ -63,8 +65,10 @@ export class ItemsPage {
     }
 
     toggleTask(task: Task) {
-        this.tasksService.updateTask$(task, { completed: !task.completed }).pipe(
+        const updated = { ...task, completed: !task.completed };
+        this.tasksService.updateTask$(task, { completed: updated.completed }).pipe(
             takeUntilDestroyed(this.destroyRef),
+            switchMap(() => this.notificationService.syncTaskNotification$(updated)),
         ).subscribe(() => Haptics.notification({ type: NotificationType.Success }));
     }
 
@@ -90,6 +94,7 @@ export class ItemsPage {
             takeUntilDestroyed(this.destroyRef),
             filter(Boolean),
             switchMap(() => this.tasksService.removeItem$(task)),
+            switchMap(() => this.notificationService.cancelTaskNotification$(task.id)),
         ).subscribe(() => Haptics.notification({ type: NotificationType.Success }));
     }
 

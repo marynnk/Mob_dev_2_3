@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { IonApp, IonRouterOutlet, IonButton, IonIcon } from '@ionic/angular/standalone';
 import { BiometricService } from './core/services/biometric.service';
 import { addIcons } from 'ionicons';
@@ -7,6 +7,10 @@ import { ConnectionService } from './core/services/connection.service';
 import { AsyncPipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { App } from '@capacitor/app';
+import { NotificationService } from './core/services/notification.service';
+import { TaskService } from './core/services/task.service';
+import { map, switchMap } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
     selector: 'app-root',
@@ -18,6 +22,9 @@ export class AppComponent implements OnInit {
     readonly biometricService = inject(BiometricService);
     readonly connectionService = inject(ConnectionService);
     private readonly router = inject(Router);
+    private readonly notificationService = inject(NotificationService);
+    private readonly taskService = inject(TaskService);
+    private readonly destroyRef = inject(DestroyRef);
 
     constructor() {
         addIcons({ lockClosedOutline, globeOutline });
@@ -25,6 +32,7 @@ export class AppComponent implements OnInit {
 
     ngOnInit(): void {
         void this.biometricService.init();
+
         void App.addListener('appUrlOpen', ({ url }) => {
             try {
                 const params = new URL(url).searchParams;
@@ -35,6 +43,13 @@ export class AppComponent implements OnInit {
                 }
             } catch {}
         });
+
+        this.notificationService.requestPermissions$().pipe(
+            switchMap(() => this.taskService.getItems$()),
+            map(items => items.filter(t => !t.completed).length),
+            switchMap(count => this.notificationService.setBadge$(count)),
+            takeUntilDestroyed(this.destroyRef),
+        ).subscribe();
     }
 
     retry(): void {

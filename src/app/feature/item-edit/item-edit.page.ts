@@ -18,6 +18,7 @@ import {
     Validators
 } from '@angular/forms';
 import { TaskService } from '../../core/services/task.service';
+import { NotificationService } from '../../core/services/notification.service';
 import { Task, TaskPhoto } from '../../core/models/task.model';
 import { catchError, forkJoin, from, map, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -38,6 +39,7 @@ export class ItemEditPage {
     private fb = inject(FormBuilder);
     private activatedRoute = inject(ActivatedRoute);
     private tasksService = inject(TaskService);
+    private notificationService = inject(NotificationService);
     private task: Task | null = null;
     private leaveSubject = new Subject<void>();
 
@@ -171,7 +173,14 @@ export class ItemEditPage {
                 const save$ = this.isEdit
                     ? this.tasksService.updateTask$(this.task!, taskData)
                     : this.tasksService.addTask$(taskData);
-                return save$;
+                return save$.pipe(
+                    switchMap(tasks => {
+                        const saved = tasks.find(t => t.id === taskId);
+                        return saved
+                            ? this.notificationService.syncTaskNotification$(saved)
+                            : of(undefined);
+                    })
+                );
             }),
             catchError(err => {
                 console.error('Save failed:', err);
