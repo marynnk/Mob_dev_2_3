@@ -1,0 +1,7 @@
+<div class="ion-display-flex">
+    @for (lang of languages; track lang) {
+        <ion-button size="small" (click)="setLanguage(lang)" [class.active]="lang === currentLanguage">
+            <ion-icon slot="icon-only" src="/assets/icon/lang/{{ lang }}.svg"/>
+        </ion-button>
+    }
+</div>

@@ -13,12 +13,21 @@ import { eyeOutline, eyeOffOutline, mailOutline, lockClosedOutline, enterOutline
 import { AuthService } from '../../core/services/auth.service';
 import { filter, firstValueFrom } from 'rxjs';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { LanguageSwitcherComponent } from '../../shared/language-switcher/language-switcher.component';
 
 @Component({
     selector: 'app-login',
     templateUrl: 'login.page.html',
     styleUrls: ['login.page.scss'],
-    imports: [IonContent, IonButton, IonIcon, IonInput, IonSpinner, ReactiveFormsModule, IonInputPasswordToggle, TranslatePipe],
+    imports: [IonContent,
+        IonButton,
+        IonIcon,
+        IonInput,
+        IonSpinner,
+        ReactiveFormsModule,
+        IonInputPasswordToggle,
+        TranslatePipe,
+        LanguageSwitcherComponent],
 })
 export class LoginPage {
     private readonly fb = inject(FormBuilder);

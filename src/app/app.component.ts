@@ -12,6 +12,7 @@ import { TaskService } from './core/services/task.service';
 import { map, switchMap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { SettingsService } from './core/services/settings.servce';
 
 @Component({
     selector: 'app-root',
@@ -27,12 +28,13 @@ export class AppComponent implements OnInit {
     private readonly taskService = inject(TaskService);
     private readonly destroyRef = inject(DestroyRef);
     private translate = inject(TranslateService);
+    private settings = inject(SettingsService);
 
     constructor() {
         addIcons({ lockClosedOutline, globeOutline });
         this.translate.addLangs(['uk', 'en']);
         this.translate.setFallbackLang('en');
-        this.translate.use('uk');
+        this.translate.use(this.settings.getLanguage());
     }
 
     ngOnInit(): void {

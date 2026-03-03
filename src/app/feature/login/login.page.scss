@@ -5,6 +5,13 @@
 
 .auth-card {
     padding: 36px 28px 32px;
+    position: relative;
+}
+
+.language-switcher {
+    position: absolute;
+    top: 16px;
+    right: 16px;
 }
 
 .auth-title {

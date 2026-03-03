@@ -1,0 +1,8 @@
+ion-button {
+    --background: transparent;
+    border-radius: 5px;
+
+    &.active {
+        box-shadow: 0 0 2px var(--ion-color-primary);
+    }
+}

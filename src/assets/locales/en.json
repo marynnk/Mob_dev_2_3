@@ -107,7 +107,8 @@
         "LOGOUT": "Logout",
         "LOGOUT_CONFIRM_TITLE": "Logout from account?",
         "LOGOUT_CANCEL": "Cancel",
-        "LOGOUT_CONFIRM": "Logout"
+        "LOGOUT_CONFIRM": "Logout",
+        "LANGUAGE": "Language:"
     },
     "PHOTO": {
         "ALT": "Photo",

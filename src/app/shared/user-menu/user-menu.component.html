@@ -8,7 +8,11 @@
             <p class="user-name">{{ account?.displayName }}</p>
             <p class="user-email">{{ account?.email }}</p>
         </div>
-        <ion-list lines="none">
+        <ion-list lines="none" (click)="closePopover()">
+            <ion-item>
+                <ion-label>{{ 'USER_MENU.LANGUAGE' | translate }}</ion-label>
+                <app-language-switcher/>
+            </ion-item>
             <ion-item button (click)="logout()" class="logout-item">
                 <ion-icon slot="start" name="log-out-outline"></ion-icon>
                 <ion-label>{{ 'USER_MENU.LOGOUT' | translate }}</ion-label>

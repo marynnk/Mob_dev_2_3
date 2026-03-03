@@ -6,7 +6,7 @@
             </div>
             <h1 class="auth-title">{{ 'LOGIN.TITLE' | translate }}</h1>
             <p class="auth-subtitle">{{ 'LOGIN.SUBTITLE' | translate }}</p>
-
+            <app-language-switcher class="language-switcher"/>
             <form [formGroup]="form" (ngSubmit)="onLogin()" novalidate>
                 <div class="field-group">
                     <ion-input

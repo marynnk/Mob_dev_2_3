@@ -13,12 +13,13 @@ import {
 import { addIcons } from 'ionicons';
 import { logOutOutline } from 'ionicons/icons';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { LanguageSwitcherComponent } from '../language-switcher/language-switcher.component';
 
 @Component({
     selector: 'app-user-menu',
     templateUrl: './user-menu.component.html',
     styleUrls: ['./user-menu.component.scss'],
-    imports: [IonButton, IonPopover, IonList, IonItem, IonIcon, IonLabel, TranslatePipe],
+    imports: [IonButton, IonPopover, IonList, IonItem, IonIcon, IonLabel, TranslatePipe, LanguageSwitcherComponent],
 })
 export class UserMenuComponent {
     @Input() account: Profile | null = null;
@@ -36,8 +37,6 @@ export class UserMenuComponent {
     }
 
     async logout() {
-        await this.popover.dismiss();
-
         const result = await ActionSheet.showActions({
             title: this.translate.instant('USER_MENU.LOGOUT_CONFIRM_TITLE'),
             options: [
@@ -49,5 +48,9 @@ export class UserMenuComponent {
         if (result.index === 1) {
             await this.authService.logout();
         }
+    }
+
+    protected async closePopover() {
+        await this.popover.dismiss();
     }
 }
