@@ -1,4 +1,5 @@
 import { Component, ElementRef, inject, Input, OnDestroy, ViewChild } from '@angular/core';
+import { DatePipe } from '@angular/common';
 import { ModalController } from '@ionic/angular';
 import {
     IonButton,
@@ -7,6 +8,9 @@ import {
     IonFooter,
     IonHeader,
     IonIcon,
+    IonLabel,
+    IonSegment,
+    IonSegmentButton,
     IonSpinner,
     IonTitle,
     IonToolbar,
@@ -15,7 +19,7 @@ import { GoogleMap } from '@capacitor/google-maps';
 import type { Marker } from '@capacitor/google-maps';
 import { Geolocation } from '@capacitor/geolocation';
 import { addIcons } from 'ionicons';
-import { closeOutline, checkmarkOutline } from 'ionicons/icons';
+import { closeOutline, checkmarkOutline, calendarOutline, locationOutline } from 'ionicons/icons';
 import { LatLng, MapMarkerType, MapPoint, LocationPoint } from '../../core/models/map.model';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { environment } from '../../../environments/environment';
@@ -23,13 +27,16 @@ import { environment } from '../../../environments/environment';
 const DEFAULT_LOCATION: LatLng = { lat: 50.4501, lng: 30.5234 };
 const DEFAULT_ZOOM = 15;
 
+export type DistanceFilter = '500' | '1000' | '5000' | 'all';
+
 @Component({
     selector: 'app-map-modal',
     templateUrl: './map-modal.component.html',
     styleUrls: ['./map-modal.component.scss'],
     imports: [
         IonHeader, IonToolbar, IonTitle, IonButtons, IonButton,
-        IonIcon, IonContent, IonFooter, IonSpinner, TranslatePipe,
+        IonIcon, IonContent, IonFooter, IonSpinner, IonSegment,
+        IonSegmentButton, IonLabel, TranslatePipe, DatePipe,
     ],
 })
 export class MapModalComponent implements OnDestroy {
@@ -42,17 +49,22 @@ export class MapModalComponent implements OnDestroy {
     private readonly modalCtrl = inject(ModalController);
     private readonly translate = inject(TranslateService);
     private map: GoogleMap | null = null;
+    private markerPointMap = new Map<string, MapPoint>();
+    private userLocation: LatLng | null = null;
 
     protected centerLocation: LatLng = DEFAULT_LOCATION;
     protected loading = true;
     protected confirming = false;
     protected error = '';
+    protected distanceFilter: DistanceFilter = 'all';
+    protected selectedPoint: MapPoint | null = null;
 
     constructor() {
-        addIcons({ closeOutline, checkmarkOutline });
+        addIcons({ closeOutline, checkmarkOutline, calendarOutline, locationOutline });
     }
 
     async ionViewDidEnter(): Promise<void> {
+        await new Promise(r => setTimeout(r, 150));
         await this.initMap();
     }
 
@@ -65,7 +77,7 @@ export class MapModalComponent implements OnDestroy {
             let center: LatLng = DEFAULT_LOCATION;
 
             if (this.mode === 'pick') {
-                center = this.initialLocation ?? await this.getCurrentLocation();
+                center = this.initialLocation ?? await this.getCurrentLocation() ?? DEFAULT_LOCATION;
             } else if (this.points.length > 0) {
                 center = this.calcCenter(this.points.map(p => p.location));
             }
@@ -84,7 +96,20 @@ export class MapModalComponent implements OnDestroy {
             });
 
             if (this.mode === 'view' && this.points.length > 0) {
-                await this.renderViewPoints();
+                void this.getCurrentLocation().then(loc => {
+                    this.userLocation = loc;
+                });
+
+                await this.renderPoints(this.points);
+
+                await this.map.setOnMarkerClickListener(({ markerId }) => {
+                    const point = this.markerPointMap.get(markerId);
+                    this.selectedPoint = point ?? null;
+                });
+
+                await this.map.setOnMapClickListener(() => {
+                    this.selectedPoint = null;
+                });
             }
 
             if (this.mode === 'pick') {
@@ -101,12 +126,12 @@ export class MapModalComponent implements OnDestroy {
         }
     }
 
-    private async getCurrentLocation(): Promise<LatLng> {
+    private async getCurrentLocation(): Promise<LatLng | null> {
         try {
             const pos = await Geolocation.getCurrentPosition({ timeout: 10000 });
             return { lat: pos.coords.latitude, lng: pos.coords.longitude };
         } catch {
-            return DEFAULT_LOCATION;
+            return null;
         }
     }
 
@@ -117,10 +142,12 @@ export class MapModalComponent implements OnDestroy {
         };
     }
 
-    private async renderViewPoints(): Promise<void> {
+    private async renderPoints(points: MapPoint[]): Promise<void> {
         if (!this.map) return;
 
-        const markers: Marker[] = this.points.map(p => ({
+        this.markerPointMap.clear();
+
+        const markers: Marker[] = points.map(p => ({
             coordinate: { lat: p.location.lat, lng: p.location.lng },
             title: p.title,
             snippet: p.description,
@@ -128,9 +155,10 @@ export class MapModalComponent implements OnDestroy {
             iconSize: { width: 30, height: 40 },
         }));
 
-        await this.map.addMarkers(markers);
+        const ids = await this.map.addMarkers(markers);
+        ids.forEach((id, i) => this.markerPointMap.set(id, points[i]));
 
-        const { center, zoom } = this.getFitCamera(this.points.map(p => p.location));
+        const { center, zoom } = this.getFitCamera(points.map(p => p.location));
         await this.map.setCamera({ coordinate: center, zoom, animate: true });
     }
 
@@ -160,6 +188,51 @@ export class MapModalComponent implements OnDestroy {
     protected resolvePointer(type?: MapMarkerType): string {
         type = type || 'other';
         return `/assets/icon/map/${type}.png`;
+    }
+
+    protected async onDistanceFilterChange(event: CustomEvent): Promise<void> {
+        this.distanceFilter = event.detail.value as DistanceFilter;
+        this.selectedPoint = null;
+        await this.applyDistanceFilter();
+    }
+
+    private async applyDistanceFilter(): Promise<void> {
+        if (!this.map) return;
+
+        const currentIds = Array.from(this.markerPointMap.keys());
+        if (currentIds.length > 0) {
+            await this.map.removeMarkers(currentIds);
+        }
+        this.markerPointMap.clear();
+
+        const filtered = this.filterByDistance(this.points);
+        if (filtered.length > 0) {
+            await this.renderPoints(filtered);
+        }
+    }
+
+    private filterByDistance(points: MapPoint[]): MapPoint[] {
+        if (this.distanceFilter === 'all' || !this.userLocation) {
+            return points;
+        }
+
+        const maxMeters = parseInt(this.distanceFilter, 10);
+        return points.filter(p =>
+            this.distanceBetween(this.userLocation!, p.location) <= maxMeters,
+        );
+    }
+
+    private distanceBetween(a: LatLng, b: LatLng): number {
+        const R = 6371000;
+        const toRad = (deg: number) => deg * Math.PI / 180;
+        const dLat = toRad(b.lat - a.lat);
+        const dLng = toRad(b.lng - a.lng);
+        const sinDlat = Math.sin(dLat / 2);
+        const sinDlng = Math.sin(dLng / 2);
+        const hav =
+            sinDlat * sinDlat +
+            Math.cos(toRad(a.lat)) * Math.cos(toRad(b.lat)) * sinDlng * sinDlng;
+        return R * 2 * Math.atan2(Math.sqrt(hav), Math.sqrt(1 - hav));
     }
 
     protected async confirm(): Promise<void> {

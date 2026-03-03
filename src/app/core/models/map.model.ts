@@ -14,4 +14,5 @@ export interface MapPoint {
     type?: MapMarkerType;
     title?: string;
     description?: string;
+    dueDate?: string;
 }

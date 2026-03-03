@@ -130,7 +130,8 @@
         "TITLE_VIEW": "Tasks on map",
         "TITLE_PICK": "Pick location",
         "CONFIRM": "Select",
-        "LOAD_ERROR": "Could not load map. Please try again later"
+        "LOAD_ERROR": "Could not load map. Please try again later",
+        "FILTER_ALL": "All"
     },
     "TASK_TYPE": {
         "HOME": "Home",

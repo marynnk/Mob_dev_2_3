@@ -42,6 +42,46 @@ ion-content {
     filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.35));
 }
 
+.marker-popup {
+    position: absolute;
+    bottom: 16px;
+    left: 16px;
+    right: 16px;
+    background: var(--ion-background-color, #fff);
+    border-radius: 12px;
+    padding: 12px 16px;
+    z-index: 10;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+
+    .popup-title {
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--ion-text-color);
+        margin: 0 0 4px;
+    }
+
+    .popup-description {
+        font-size: 13px;
+        color: var(--ion-color-medium);
+        margin: 0 0 6px;
+        line-height: 1.4;
+    }
+
+    .popup-due {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 12px;
+        color: var(--ion-color-medium);
+        margin: 0;
+
+        ion-icon {
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+    }
+}
+
 ion-footer {
     ion-toolbar {
         --background: var(--ion-background-color);

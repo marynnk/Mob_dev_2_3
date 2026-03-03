@@ -29,6 +29,23 @@
             <img [src]="resolvePointer(markerType)" width="30"/>
         </div>
     }
+
+    @if (selectedPoint) {
+        <div class="marker-popup" (click)="$event.stopPropagation()">
+            @if (selectedPoint.title) {
+                <p class="popup-title">{{ selectedPoint.title }}</p>
+            }
+            @if (selectedPoint.description) {
+                <p class="popup-description">{{ selectedPoint.description }}</p>
+            }
+            @if (selectedPoint.dueDate) {
+                <p class="popup-due">
+                    <ion-icon name="calendar-outline"></ion-icon>
+                    {{ selectedPoint.dueDate | date:'d MMM yyyy, HH:mm' }}
+                </p>
+            }
+        </div>
+    }
 </ion-content>
 
 @if (mode === 'pick') {
@@ -47,6 +64,30 @@
                 }
                 {{ 'MAP.CONFIRM' | translate }}
             </ion-button>
+        </ion-toolbar>
+    </ion-footer>
+}
+
+@if (mode === 'view' && !loading && !error) {
+    <ion-footer>
+        <ion-toolbar>
+            <ion-segment
+                [value]="distanceFilter"
+                (ionChange)="onDistanceFilterChange($event)"
+            >
+                <ion-segment-button value="500">
+                    <ion-label>500м</ion-label>
+                </ion-segment-button>
+                <ion-segment-button value="1000">
+                    <ion-label>1км</ion-label>
+                </ion-segment-button>
+                <ion-segment-button value="5000">
+                    <ion-label>5км</ion-label>
+                </ion-segment-button>
+                <ion-segment-button value="all">
+                    <ion-label>{{ 'MAP.FILTER_ALL' | translate }}</ion-label>
+                </ion-segment-button>
+            </ion-segment>
         </ion-toolbar>
     </ion-footer>
 }
