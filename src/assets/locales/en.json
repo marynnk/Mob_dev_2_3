@@ -1,1 +1,124 @@
-{}
+{
+    "APP": {
+        "LOCKED_TITLE": "Application was locked",
+        "BIOMETRIC_BTN": "Authorise with Face ID / Touch ID",
+        "NO_CONNECTION_TITLE": "No connection",
+        "NO_CONNECTION_HINT": "Please check your internet connection and try again"
+    },
+    "COMMON": {
+        "SAVE": "Save",
+        "CANCEL": "Cancel",
+        "REQUIRED": "Requred field",
+        "EMAIL_LABEL": "Email *",
+        "EMAIL_PLACEHOLDER": "you@example.com",
+        "EMAIL_REQUIRED": "Email is required",
+        "EMAIL_INVALID": "Enter valid email",
+        "PASSWORD_LABEL": "Password *",
+        "PASSWORD_PLACEHOLDER": "Min 8 symbols",
+        "PASSWORD_REQUIRED": "Password is required",
+        "CONFIRM_PLACEHOLDER": "Repeat password",
+        "PASSWORDS_MISMATCH": "Passwords didnt match",
+        "MIN_LENGTH": "Min {{min}} symbols",
+        "MAX_LENGTH": "Max {{max}} symbols",
+        "TOO_MANY_REQUESTS": "Too much tries. Please try again later",
+        "UNKNOWN_ERROR": "Ooops, something went wrong. Please try again later",
+        "BACK_TO_LOGIN": "Return to login"
+    },
+    "LOGIN": {
+        "TITLE": "Login",
+        "SUBTITLE": "Glade to see you again!",
+        "SUBMIT": "Login",
+        "NO_ACCOUNT": "Still no account?",
+        "REGISTER_LINK": "Registration",
+        "FORGOT_PASSWORD": "Forgot password?",
+        "INVALID_CREDENTIAL": "Wrong email or password"
+    },
+    "REGISTER": {
+        "TITLE": "Registration",
+        "SUBTITLE": "Create your account",
+        "NAME_LABEL": "Username *",
+        "NAME_PLACEHOLDER": "Username",
+        "PASSWORD_PLACEHOLDER": "Min 8 symbols, 1 uppercase, 1 digit",
+        "CONFIRM_LABEL": "Confirm password *",
+        "EXTRA_SECTION": "Other info",
+        "PHONE_LABEL": "Phone number",
+        "PHONE_PLACEHOLDER": "+380 XX XXX XX XX",
+        "BIRTH_LABEL": "Birthday",
+        "BIO_LABEL": "Bio",
+        "BIO_PLACEHOLDER": "Please, tell us about yourself…",
+        "SUBMIT": "Register",
+        "HAS_ACCOUNT": "Already have an account?",
+        "LOGIN_LINK": "Login",
+        "PASSWORD_PATTERN": "Uppercase and number required",
+        "PHONE_INVALID": "Invalid phone number format",
+        "EMAIL_TAKEN": "This email already exists",
+        "WEAK_PASSWORD": "Password is too weak",
+        "INVALID_EMAIL": "Invalid email format"
+    },
+    "FORGOT_PASSWORD": {
+        "TITLE": "Recover password",
+        "SUBTITLE": "Please, enter your email address. We will send you a link to recover your password",
+        "SUBMIT": "Recover link was sent",
+        "SENT_TITLE": "Mail sent!",
+        "SENT_TEXT": "Check your mailbox and open link from the mail. It will automatically open the app to change your password.",
+        "SENT_HINT": "Didnt find the mail? Check your spam folder",
+        "USER_NOT_FOUND": "Account with this email not found",
+        "INVALID_EMAIL": "Invalid email format"
+    },
+    "RESET_PASSWORD": {
+        "VERIFYING": "Checking link...",
+        "ERROR_TITLE": "Error",
+        "TITLE": "New password",
+        "SUBTITLE": "Set new password for {{email}}",
+        "PASSWORD_LABEL": "New password *",
+        "CONFIRM_LABEL": "Confirm password *",
+        "SUBMIT": "Save password",
+        "SUCCESS_TITLE": "Password changed!",
+        "SUCCESS_TEXT": "You can now login with new password",
+        "INVALID_LINK": "Change password link is invalid or expired",
+        "EXPIRED_CODE": "Link expired. Request new one",
+        "INVALID_CODE": "Link is invalid or already used",
+        "WEAK_PASSWORD": "Too wee password."
+    },
+    "ITEMS": {
+        "TITLE": "My tasks",
+        "EMPTY_TITLE": "No tasks yet",
+        "EMPTY_SUBTITLE": "Press + to add first task",
+        "DELETE_CONFIRM": "Are you sure you want to delete this task?",
+        "DELETE_NO": "No",
+        "DELETE_YES": "Yes"
+    },
+    "ITEM_EDIT": {
+        "TITLE_EDIT": "Edit",
+        "TITLE_NEW": "New task",
+        "TASK_LABEL": "Task name *",
+        "TASK_PLACEHOLDER": "Enter name",
+        "DUE_LABEL": "Due date",
+        "DESC_LABEL": "Task description",
+        "DESC_PLACEHOLDER": "Enter description (optional)",
+        "PHOTOS_LABEL": "Photos",
+        "SAVE": "Save"
+    },
+    "TASK_ITEM": {
+        "PHOTO_COUNT": "Images: {{count}}",
+        "NO_DESCRIPTION": "Without description"
+    },
+    "USER_MENU": {
+        "LOGOUT": "Logout",
+        "LOGOUT_CONFIRM_TITLE": "Logout from account?",
+        "LOGOUT_CANCEL": "Cancel",
+        "LOGOUT_CONFIRM": "Logout"
+    },
+    "PHOTO": {
+        "ALT": "Photo",
+        "ADD": "Add",
+        "PICK_TITLE": "Add photo",
+        "CAMERA": "Camera",
+        "GALLERY": "Image gallery",
+        "CANCEL": "Cancel"
+    },
+    "NOTIFICATIONS": {
+        "TASK_DUE_TITLE": "Task \"{{title}}\" will be expired within {{hours}} hours.",
+        "TASK_DUE_BODY": "Task is due to be done"
+    }
+}

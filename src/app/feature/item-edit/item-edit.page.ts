@@ -24,6 +24,7 @@ import { catchError, forkJoin, from, map, of, Subject, switchMap, takeUntil, tap
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { PhotoGridComponent } from '../../shared/photo-grid/photo-grid.component';
 import { PhotoViewComponent } from '../../shared/photo-view/photo-view.component';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-edit-item',
@@ -31,11 +32,12 @@ import { PhotoViewComponent } from '../../shared/photo-view/photo-view.component
     styleUrls: ['item-edit.page.scss'],
     imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonBackButton,
         ReactiveFormsModule, IonButton, IonIcon, IonInput, IonTextarea, IonSpinner, PhotoGridComponent,
-        PhotoViewComponent],
+        PhotoViewComponent, TranslatePipe],
 })
 export class ItemEditPage {
     private destroyRef = inject(DestroyRef);
     private router = inject(Router);
+    private translate = inject(TranslateService);
     private fb = inject(FormBuilder);
     private activatedRoute = inject(ActivatedRoute);
     private tasksService = inject(TaskService);
@@ -83,9 +85,9 @@ export class ItemEditPage {
     fieldError(name: string): string {
         const c = this.form.get(name);
         if (!c) return '';
-        if (c.hasError('required')) return 'Поле є обовʼязковим';
+        if (c.hasError('required')) return this.translate.instant('COMMON.REQUIRED');
         if (c.hasError('maxlength')) {
-            return `Максимум ${c.errors?.['maxlength']?.requiredLength as number} символів`;
+            return this.translate.instant('COMMON.MAX_LENGTH', { max: c.errors?.['maxlength']?.requiredLength as number });
         }
         return '';
     }

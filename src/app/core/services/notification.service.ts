@@ -1,11 +1,13 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { from, Observable, of, switchMap } from 'rxjs';
 import { LocalNotifications } from '@capacitor/local-notifications';
 import { Badge } from '@capawesome/capacitor-badge';
 import { Task } from '../models/task.model';
+import { TranslateService } from '@ngx-translate/core';
 
 @Injectable({ providedIn: 'root' })
 export class NotificationService {
+    private translate = inject(TranslateService);
     private hourMilliseconds = 1000 * 60 * 60;
     private notifyHoursBefore = 1 * this.hourMilliseconds;
 
@@ -34,8 +36,8 @@ export class NotificationService {
                 return from(LocalNotifications.schedule({
                     notifications: [{
                         id,
-                        title: `Завдання "${task.title}" збігає за ${this.notifyHoursBefore / this.hourMilliseconds} годин(у)`,
-                        body: task.description ?? 'Завдання очікує на виконання',
+                        title: this.translate.instant('NOTIFICATIONS.TASK_DUE_TITLE', { title: task.title, hours: this.notifyHoursBefore / this.hourMilliseconds }),
+                        body: task.description ?? this.translate.instant('NOTIFICATIONS.TASK_DUE_BODY'),
                         schedule: { at },
                     }],
                 })).pipe(switchMap(() => of(undefined)));

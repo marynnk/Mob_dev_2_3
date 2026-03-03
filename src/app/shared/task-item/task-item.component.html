@@ -19,10 +19,10 @@
                     <p class="due-date">{{ item.dueDate | date: 'dd.MM.yyyy HH:mm' }}</p>
                 }
                 @if (item.photos?.length) {
-                    <p class="photo-count">Зображень: {{item.photos?.length}}</p>
+                    <p class="photo-count">{{ 'TASK_ITEM.PHOTO_COUNT' | translate: { count: item.photos?.length } }}</p>
                 }
             </div>
-            <p>{{ item.description || 'Без опису' }}</p>
+            <p>{{ item.description || ('TASK_ITEM.NO_DESCRIPTION' | translate) }}</p>
         </ion-label>
         <ion-icon slot="end" name="create-outline" class="edit-hint"></ion-icon>
     </ion-item>

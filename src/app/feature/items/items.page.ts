@@ -24,7 +24,7 @@ import { ActionSheet, ActionSheetButtonStyle } from '@capacitor/action-sheet';
 import { TaskItemComponent } from '../../shared/task-item/task-item.component';
 import { NotificationService } from '../../core/services/notification.service';
 import { UserMenuComponent } from '../../shared/user-menu/user-menu.component';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-home',
@@ -46,6 +46,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 export class ItemsPage {
     private destroyRef = inject(DestroyRef);
     private router = inject(Router);
+    private translate = inject(TranslateService);
     private tasksService = inject(TaskService);
     private accountService = inject(AccountService);
     private notificationService = inject(NotificationService);
@@ -80,12 +81,12 @@ export class ItemsPage {
     confirmTaskDeletion(task: Task) {
         return from(Haptics.notification({ type: NotificationType.Error })).pipe(
             switchMap(() => ActionSheet.showActions({
-                title: 'Дійсно видалити задачу?',
+                title: this.translate.instant('ITEMS.DELETE_CONFIRM'),
                 message: task.title,
                 options: [
-                    { title: 'Ні', },
+                    { title: this.translate.instant('ITEMS.DELETE_NO') },
                     {
-                        title: 'Так',
+                        title: this.translate.instant('ITEMS.DELETE_YES'),
                         style: ActionSheetButtonStyle.Destructive,
                     },
                 ],

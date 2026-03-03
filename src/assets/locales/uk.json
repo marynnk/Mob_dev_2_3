@@ -1,3 +1,124 @@
 {
-
+  "APP": {
+    "LOCKED_TITLE": "Додаток заблоковано",
+    "BIOMETRIC_BTN": "Увійти через Face ID / Touch ID",
+    "NO_CONNECTION_TITLE": "Відсутній зв'язок",
+    "NO_CONNECTION_HINT": "Перевірте зв'язок і спробуйте знову"
+  },
+  "COMMON": {
+    "SAVE": "Зберегти",
+    "CANCEL": "Скасувати",
+    "REQUIRED": "Поле є обовʼязковим",
+    "EMAIL_LABEL": "Email *",
+    "EMAIL_PLACEHOLDER": "you@example.com",
+    "EMAIL_REQUIRED": "Email є обовʼязковим",
+    "EMAIL_INVALID": "Введіть коректний email",
+    "PASSWORD_LABEL": "Пароль *",
+    "PASSWORD_PLACEHOLDER": "Мін. 8 символів",
+    "PASSWORD_REQUIRED": "Пароль є обовʼязковим",
+    "CONFIRM_PLACEHOLDER": "Повторіть пароль",
+    "PASSWORDS_MISMATCH": "Паролі не збігаються",
+    "MIN_LENGTH": "Мінімум {{min}} символів",
+    "MAX_LENGTH": "Максимум {{max}} символів",
+    "TOO_MANY_REQUESTS": "Забагато спроб. Спробуйте пізніше",
+    "UNKNOWN_ERROR": "Щось пішло не так. Спробуйте ще раз",
+    "BACK_TO_LOGIN": "Повернутись до входу"
+  },
+  "LOGIN": {
+    "TITLE": "Вхід",
+    "SUBTITLE": "Раді бачити вас знову!",
+    "SUBMIT": "Увійти",
+    "NO_ACCOUNT": "Немає акаунту?",
+    "REGISTER_LINK": "Зареєструватися",
+    "FORGOT_PASSWORD": "Забули пароль?",
+    "INVALID_CREDENTIAL": "Невірний email або пароль"
+  },
+  "REGISTER": {
+    "TITLE": "Реєстрація",
+    "SUBTITLE": "Створіть свій акаунт",
+    "NAME_LABEL": "Імʼя користувача *",
+    "NAME_PLACEHOLDER": "Ім'я користувача",
+    "PASSWORD_PLACEHOLDER": "Мін. 8 символів, 1 велика, 1 цифра",
+    "CONFIRM_LABEL": "Підтвердження паролю *",
+    "EXTRA_SECTION": "Додаткові дані",
+    "PHONE_LABEL": "Номер телефону",
+    "PHONE_PLACEHOLDER": "+380 XX XXX XX XX",
+    "BIRTH_LABEL": "Дата народження",
+    "BIO_LABEL": "Про себе",
+    "BIO_PLACEHOLDER": "Розкажіть трохи про себе…",
+    "SUBMIT": "Зареєструватися",
+    "HAS_ACCOUNT": "Вже є акаунт?",
+    "LOGIN_LINK": "Увійти",
+    "PASSWORD_PATTERN": "Потрібна велика літера та цифра",
+    "PHONE_INVALID": "Невірний формат номера",
+    "EMAIL_TAKEN": "Цей email вже використовується",
+    "WEAK_PASSWORD": "Пароль надто слабкий",
+    "INVALID_EMAIL": "Невірний формат email"
+  },
+  "FORGOT_PASSWORD": {
+    "TITLE": "Відновлення пароля",
+    "SUBTITLE": "Введіть email вашого акаунту — ми надішлемо посилання для скидання пароля",
+    "SUBMIT": "Надіслати посилання",
+    "SENT_TITLE": "Листа надіслано!",
+    "SENT_TEXT": "Перевірте вашу поштову скриньку. Відкрийте посилання з листа — воно автоматично відкриє додаток для зміни пароля.",
+    "SENT_HINT": "Не знайшли листа? Перевірте папку «Спам»",
+    "USER_NOT_FOUND": "Акаунт з таким email не знайдено",
+    "INVALID_EMAIL": "Невалідний формат email"
+  },
+  "RESET_PASSWORD": {
+    "VERIFYING": "Перевірка посилання...",
+    "ERROR_TITLE": "Помилка",
+    "TITLE": "Новий пароль",
+    "SUBTITLE": "Встановіть новий пароль для {{email}}",
+    "PASSWORD_LABEL": "Новий пароль *",
+    "CONFIRM_LABEL": "Підтвердіть пароль *",
+    "SUBMIT": "Зберегти пароль",
+    "SUCCESS_TITLE": "Пароль змінено!",
+    "SUCCESS_TEXT": "Ви можете увійти в додаток з новим паролем",
+    "INVALID_LINK": "Посилання для скидання пароля недійсне або застаріле",
+    "EXPIRED_CODE": "Посилання застаріло. Запросіть нове",
+    "INVALID_CODE": "Посилання недійсне або вже використане",
+    "WEAK_PASSWORD": "Пароль занадто слабкий"
+  },
+  "ITEMS": {
+    "TITLE": "Мої завдання",
+    "EMPTY_TITLE": "Завдань ще немає",
+    "EMPTY_SUBTITLE": "Натисніть + щоб додати перше завдання",
+    "DELETE_CONFIRM": "Дійсно видалити задачу?",
+    "DELETE_NO": "Ні",
+    "DELETE_YES": "Так"
+  },
+  "ITEM_EDIT": {
+    "TITLE_EDIT": "Редагування",
+    "TITLE_NEW": "Нове завдання",
+    "TASK_LABEL": "Назва завдання *",
+    "TASK_PLACEHOLDER": "Введіть назву",
+    "DUE_LABEL": "Кінцева дата",
+    "DESC_LABEL": "Опис завдання",
+    "DESC_PLACEHOLDER": "Введіть опис (необовʼязково)",
+    "PHOTOS_LABEL": "Фотографії",
+    "SAVE": "Зберегти"
+  },
+  "TASK_ITEM": {
+    "PHOTO_COUNT": "Зображень: {{count}}",
+    "NO_DESCRIPTION": "Без опису"
+  },
+  "USER_MENU": {
+    "LOGOUT": "Вийти",
+    "LOGOUT_CONFIRM_TITLE": "Вийти з акаунту?",
+    "LOGOUT_CANCEL": "Скасувати",
+    "LOGOUT_CONFIRM": "Вийти"
+  },
+  "PHOTO": {
+    "ALT": "Фото",
+    "ADD": "Додати",
+    "PICK_TITLE": "Додати фото",
+    "CAMERA": "Камера",
+    "GALLERY": "Галерея",
+    "CANCEL": "Скасувати"
+  },
+  "NOTIFICATIONS": {
+    "TASK_DUE_TITLE": "Завдання \"{{title}}\" збігає за {{hours}} год.",
+    "TASK_DUE_BODY": "Завдання очікує на виконання"
+  }
 }

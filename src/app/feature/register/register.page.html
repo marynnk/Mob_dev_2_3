@@ -6,8 +6,8 @@
                 <ion-icon name="person-add-outline"/>
             </div>
 
-            <h1 class="auth-title">Реєстрація</h1>
-            <p class="auth-subtitle">Створіть свій акаунт</p>
+            <h1 class="auth-title">{{ 'REGISTER.TITLE' | translate }}</h1>
+            <p class="auth-subtitle">{{ 'REGISTER.SUBTITLE' | translate }}</p>
 
             <form [formGroup]="form" (ngSubmit)="onRegister()" novalidate>
 
@@ -15,10 +15,10 @@
                     <ion-input
                         fill="outline"
                         type="text"
-                        label="Імʼя користувача *"
+                        [label]="'REGISTER.NAME_LABEL' | translate"
                         labelPlacement="stacked"
                         autocomplete="username"
-                        placeholder="Ім'я користувача"
+                        [placeholder]="'REGISTER.NAME_PLACEHOLDER' | translate"
                         formControlName="displayName"
                         [errorText]="fieldError('displayName')"
                         [class.ion-invalid]="controls.displayName.invalid && controls.displayName.touched"
@@ -32,11 +32,11 @@
                     <ion-input
                         fill="outline"
                         type="email"
-                        label="Email *"
+                        [label]="'COMMON.EMAIL_LABEL' | translate"
                         labelPlacement="stacked"
                         inputmode="email"
                         autocomplete="email"
-                        placeholder="you@example.com"
+                        [placeholder]="'COMMON.EMAIL_PLACEHOLDER' | translate"
                         formControlName="email"
                         [errorText]="fieldError('email')"
                         [class.ion-invalid]="controls.email.invalid && controls.email.touched"
@@ -50,10 +50,10 @@
                     <ion-input
                         fill="outline"
                         [type]="'password'"
-                        label="Пароль *"
+                        [label]="'COMMON.PASSWORD_LABEL' | translate"
                         labelPlacement="stacked"
                         autocomplete="new-password"
-                        placeholder="Мін. 8 символів, 1 велика, 1 цифра"
+                        [placeholder]="'REGISTER.PASSWORD_PLACEHOLDER' | translate"
                         formControlName="password"
                         [errorText]="fieldError('password')"
                         [class.ion-invalid]="controls.password.invalid && controls.password.touched"
@@ -68,10 +68,10 @@
                     <ion-input
                         fill="outline"
                         [type]="'password'"
-                        label="Підтвердження паролю *"
+                        [label]="'REGISTER.CONFIRM_LABEL' | translate"
                         labelPlacement="stacked"
                         autocomplete="new-password"
-                        placeholder="Повторіть пароль"
+                        [placeholder]="'COMMON.CONFIRM_PLACEHOLDER' | translate"
                         formControlName="confirmPassword"
                         [errorText]="fieldError('confirmPassword')"
                         [class.ion-invalid]="(controls.confirmPassword.invalid && (controls.confirmPassword.touched || controls.confirmPassword.dirty))"
@@ -82,17 +82,17 @@
                     </ion-input>
                 </div>
 
-                <div class="section-divider"><span>Додаткові дані</span></div>
+                <div class="section-divider"><span>{{ 'REGISTER.EXTRA_SECTION' | translate }}</span></div>
 
                 <div class="field-group">
                     <ion-input
                         fill="outline"
                         type="tel"
-                        label="Номер телефону"
+                        [label]="'REGISTER.PHONE_LABEL' | translate"
                         labelPlacement="stacked"
                         inputmode="tel"
                         autocomplete="tel"
-                        placeholder="+380 XX XXX XX XX"
+                        [placeholder]="'REGISTER.PHONE_PLACEHOLDER' | translate"
                         formControlName="phone"
                         [errorText]="fieldError('phone')"
                         [class.ion-invalid]="controls.phone.invalid && controls.phone.touched"
@@ -106,7 +106,7 @@
                     <ion-input
                         fill="outline"
                         type="date"
-                        label="Дата народження"
+                        [label]="'REGISTER.BIRTH_LABEL' | translate"
                         labelPlacement="stacked"
                         formControlName="dateOfBirth"
                     >
@@ -117,12 +117,12 @@
                 <div class="field-group">
                     <ion-textarea
                         fill="outline"
-                        label="Про себе"
+                        [label]="'REGISTER.BIO_LABEL' | translate"
                         labelPlacement="stacked"
                         rows="3"
                         [counter]="true"
                         [maxlength]="200"
-                        placeholder="Розкажіть трохи про себе…"
+                        [placeholder]="'REGISTER.BIO_PLACEHOLDER' | translate"
                         formControlName="bio"
                         [errorText]="fieldError('bio')"
                         [class.ion-invalid]="controls.bio.invalid && controls.bio.touched"
@@ -140,15 +140,15 @@
                     @if (loading) {
                         <ion-spinner name="crescent"/>
                     } @else {
-                        Зареєструватися
+                        {{ 'REGISTER.SUBMIT' | translate }}
                     }
                 </ion-button>
 
             </form>
 
             <p class="auth-link">
-                Вже є акаунт?
-                <button type="button" class="link-btn" (click)="goToLogin()">Увійти</button>
+                {{ 'REGISTER.HAS_ACCOUNT' | translate }}
+                <button type="button" class="link-btn" (click)="goToLogin()">{{ 'REGISTER.LOGIN_LINK' | translate }}</button>
             </p>
 
         </div>

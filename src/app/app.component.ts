@@ -11,13 +11,13 @@ import { NotificationService } from './core/services/notification.service';
 import { TaskService } from './core/services/task.service';
 import { map, switchMap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-root',
     templateUrl: 'app.component.html',
     styleUrls: ['app.component.scss'],
-    imports: [IonApp, IonRouterOutlet, IonButton, IonIcon, AsyncPipe],
+    imports: [IonApp, IonRouterOutlet, IonButton, IonIcon, AsyncPipe, TranslatePipe],
 })
 export class AppComponent implements OnInit {
     readonly biometricService = inject(BiometricService);

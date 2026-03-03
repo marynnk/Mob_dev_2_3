@@ -12,17 +12,19 @@ import { addIcons } from 'ionicons';
 import { eyeOutline, eyeOffOutline, mailOutline, lockClosedOutline, enterOutline } from 'ionicons/icons';
 import { AuthService } from '../../core/services/auth.service';
 import { filter, firstValueFrom } from 'rxjs';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-login',
     templateUrl: 'login.page.html',
     styleUrls: ['login.page.scss'],
-    imports: [IonContent, IonButton, IonIcon, IonInput, IonSpinner, ReactiveFormsModule, IonInputPasswordToggle],
+    imports: [IonContent, IonButton, IonIcon, IonInput, IonSpinner, ReactiveFormsModule, IonInputPasswordToggle, TranslatePipe],
 })
 export class LoginPage {
     private readonly fb = inject(FormBuilder);
     private readonly router = inject(Router);
     private readonly authService = inject(AuthService);
+    private readonly translate = inject(TranslateService);
 
     loading = false;
     error = '';
@@ -45,14 +47,14 @@ export class LoginPage {
     }
 
     emailError(): string {
-        if (this.email.hasError('required')) return 'Email є обовʼязковим';
-        if (this.email.hasError('email')) return 'Введіть коректний email';
+        if (this.email.hasError('required')) return this.translate.instant('COMMON.EMAIL_REQUIRED');
+        if (this.email.hasError('email')) return this.translate.instant('COMMON.EMAIL_INVALID');
         return '';
     }
 
     passwordError(): string {
-        if (this.password.hasError('required')) return 'Пароль є обовʼязковим';
-        if (this.password.hasError('minlength')) return 'Мінімум 8 символів';
+        if (this.password.hasError('required')) return this.translate.instant('COMMON.PASSWORD_REQUIRED');
+        if (this.password.hasError('minlength')) return this.translate.instant('COMMON.MIN_LENGTH', { min: 8 });
         return '';
     }
 
@@ -86,11 +88,11 @@ export class LoginPage {
     private mapError(err: unknown): string {
         const code = (err as { code?: string })?.code ?? '';
         if (code.includes('user-not-found') || code.includes('wrong-password') || code.includes('invalid-credential')) {
-            return 'Невірний email або пароль';
+            return this.translate.instant('LOGIN.INVALID_CREDENTIAL');
         }
         if (code.includes('too-many-requests')) {
-            return 'Забагато спроб. Спробуйте пізніше';
+            return this.translate.instant('COMMON.TOO_MANY_REQUESTS');
         }
-        return 'Щось пішло не так. Спробуйте ще раз';
+        return this.translate.instant('COMMON.UNKNOWN_ERROR');
     }
 }

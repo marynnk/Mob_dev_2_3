@@ -4,17 +4,17 @@
     @if (biometricService.isLocked()) {
         <div class="lock-screen">
             <ion-icon name="lock-closed-outline" class="lock-screen__icon"/>
-            <p class="lock-screen__title">Додаток заблоковано</p>
+            <p class="lock-screen__title">{{ 'APP.LOCKED_TITLE' | translate }}</p>
             <ion-button (click)="retry()" expand="block" class="lock-screen__button">
-                Увійти через Face ID / Touch ID
+                {{ 'APP.BIOMETRIC_BTN' | translate }}
             </ion-button>
         </div>
     }
     @if (!biometricService.isLocked() && (connectionService.isOnline$ | async) === false) {
         <div class="lock-screen">
             <ion-icon name="globe-outline" class="lock-screen__icon"></ion-icon>
-            <p class="lock-screen__title">Відсутній зв'язок</p>
-            <p class="lock-screen__title">Перевірте зв'язок і спробуйте знову</p>
+            <p class="lock-screen__title">{{ 'APP.NO_CONNECTION_TITLE' | translate }}</p>
+            <p class="lock-screen__title">{{ 'APP.NO_CONNECTION_HINT' | translate }}</p>
         </div>
     }
 </ion-app>

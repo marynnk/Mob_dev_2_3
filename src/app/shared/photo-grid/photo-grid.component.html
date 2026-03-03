@@ -2,7 +2,7 @@
 
     @for (photo of photos; track photo.storagePath) {
         <div class="photo-item">
-            <img [src]="photo.url" alt="Фото" (click)="handleOpenPhoto(photo.url)" />
+            <img [src]="photo.url" [attr.alt]="'PHOTO.ALT' | translate" (click)="handleOpenPhoto(photo.url)" />
             <button type="button" class="photo-remove" (click)="handleRemoveExisting(photo)">
                 <ion-icon name="close-circle"></ion-icon>
             </button>
@@ -11,7 +11,7 @@
 
     @for (photo of pendingPhotos; track $index) {
         <div class="photo-item photo-pending">
-            <img [src]="photo.preview" alt="Фото" (click)="handleOpenPhoto(photo.preview)" />
+            <img [src]="photo.preview" [attr.alt]="'PHOTO.ALT' | translate" (click)="handleOpenPhoto(photo.preview)" />
             <button type="button" class="photo-remove" (click)="handleRemoveAdded($index)">
                 <ion-icon name="close-circle"></ion-icon>
             </button>
@@ -20,7 +20,7 @@
 
     <button type="button" class="photo-add" (click)="pickPhoto()">
         <ion-icon name="camera-outline"></ion-icon>
-        <span>Додати</span>
+        <span>{{ 'PHOTO.ADD' | translate }}</span>
     </button>
 
 </div>

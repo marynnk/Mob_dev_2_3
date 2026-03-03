@@ -20,6 +20,7 @@ import { addIcons } from 'ionicons';
 import { checkmarkCircleOutline, eyeOffOutline, eyeOutline, lockClosedOutline } from 'ionicons/icons';
 import { AuthService } from '../../core/services/auth.service';
 import { catchError, of, tap } from 'rxjs';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 function passwordMatchValidator(): ValidatorFn {
     return (group: AbstractControl): ValidationErrors | null => {
@@ -33,13 +34,14 @@ function passwordMatchValidator(): ValidatorFn {
     selector: 'app-reset-password',
     templateUrl: 'reset-password.page.html',
     styleUrls: ['reset-password.page.scss'],
-    imports: [IonContent, IonButton, IonIcon, IonInput, IonSpinner, ReactiveFormsModule, IonInputPasswordToggle],
+    imports: [IonContent, IonButton, IonIcon, IonInput, IonSpinner, ReactiveFormsModule, IonInputPasswordToggle, TranslatePipe],
 })
 export class ResetPasswordPage implements OnInit {
     private readonly fb = inject(FormBuilder);
     private readonly router = inject(Router);
     private readonly route = inject(ActivatedRoute);
     private readonly authService = inject(AuthService);
+    private readonly translate = inject(TranslateService);
 
     verifying = true;
     loading = false;
@@ -69,7 +71,7 @@ export class ResetPasswordPage implements OnInit {
         this.oobCode = this.route.snapshot.queryParamMap.get('oobCode') ?? '';
 
         if (!this.oobCode) {
-            this.error = 'Посилання для скидання пароля недійсне або застаріле';
+            this.error = this.translate.instant('RESET_PASSWORD.INVALID_LINK');
             this.verifying = false;
             return;
         }
@@ -88,14 +90,14 @@ export class ResetPasswordPage implements OnInit {
     }
 
     passwordError(): string {
-        if (this.password.hasError('required')) return 'Пароль є обовʼязковим';
-        if (this.password.hasError('minlength')) return 'Мінімум 8 символів';
+        if (this.password.hasError('required')) return this.translate.instant('COMMON.PASSWORD_REQUIRED');
+        if (this.password.hasError('minlength')) return this.translate.instant('COMMON.MIN_LENGTH', { min: 8 });
         return '';
     }
 
     confirmError(): string {
         if (this.confirm.touched && this.form.hasError('passwordMismatch')) {
-            return 'Паролі не збігаються';
+            return this.translate.instant('COMMON.PASSWORDS_MISMATCH');
         }
         return '';
     }
@@ -126,10 +128,10 @@ export class ResetPasswordPage implements OnInit {
 
     private mapError(err: unknown): string {
         const code = (err as { code?: string })?.code ?? '';
-        if (code.includes('expired-action-code')) return 'Посилання застаріло. Запросіть нове';
-        if (code.includes('invalid-action-code')) return 'Посилання недійсне або вже використане';
-        if (code.includes('weak-password')) return 'Пароль занадто слабкий';
-        if (code.includes('too-many-requests')) return 'Забагато спроб. Спробуйте пізніше';
-        return 'Щось пішло не так. Спробуйте ще раз';
+        if (code.includes('expired-action-code')) return this.translate.instant('RESET_PASSWORD.EXPIRED_CODE');
+        if (code.includes('invalid-action-code')) return this.translate.instant('RESET_PASSWORD.INVALID_CODE');
+        if (code.includes('weak-password')) return this.translate.instant('RESET_PASSWORD.WEAK_PASSWORD');
+        if (code.includes('too-many-requests')) return this.translate.instant('COMMON.TOO_MANY_REQUESTS');
+        return this.translate.instant('COMMON.UNKNOWN_ERROR');
     }
 }

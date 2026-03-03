@@ -16,7 +16,7 @@
         </ion-header>
         <ion-content>
             <div class="photo-viewer-wrap">
-                <img [src]="photoUrl" class="photo-viewer-img" alt="Фото" />
+                <img [src]="photoUrl" class="photo-viewer-img" [attr.alt]="'PHOTO.ALT' | translate" />
             </div>
         </ion-content>
     </ng-template>

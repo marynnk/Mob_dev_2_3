@@ -4,6 +4,7 @@ import { IonIcon, IonItem, IonItemOption, IonItemOptions, IonItemSliding, IonLab
 import { DatePipe } from '@angular/common';
 import { addIcons } from 'ionicons';
 import { checkmarkCircle, createOutline, radioButtonOff, trashOutline } from 'ionicons/icons';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-task-item',
@@ -15,7 +16,8 @@ import { checkmarkCircle, createOutline, radioButtonOff, trashOutline } from 'io
         IonItem,
         IonLabel,
         DatePipe,
-        IonItemSliding
+        IonItemSliding,
+        TranslatePipe,
     ],
     styleUrls: ['./task-item.component.scss']
 })

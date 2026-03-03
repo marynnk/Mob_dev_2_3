@@ -12,18 +12,20 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { logOutOutline } from 'ionicons/icons';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-user-menu',
     templateUrl: './user-menu.component.html',
     styleUrls: ['./user-menu.component.scss'],
-    imports: [IonButton, IonPopover, IonList, IonItem, IonIcon, IonLabel],
+    imports: [IonButton, IonPopover, IonList, IonItem, IonIcon, IonLabel, TranslatePipe],
 })
 export class UserMenuComponent {
     @Input() account: Profile | null = null;
     @ViewChild(IonPopover) private popover!: IonPopover;
 
     private authService = inject(AuthService);
+    private translate = inject(TranslateService);
 
     constructor() {
         addIcons({ logOutOutline });
@@ -37,10 +39,10 @@ export class UserMenuComponent {
         await this.popover.dismiss();
 
         const result = await ActionSheet.showActions({
-            title: 'Вийти з акаунту?',
+            title: this.translate.instant('USER_MENU.LOGOUT_CONFIRM_TITLE'),
             options: [
-                { title: 'Скасувати' },
-                { title: 'Вийти', style: ActionSheetButtonStyle.Destructive },
+                { title: this.translate.instant('USER_MENU.LOGOUT_CANCEL') },
+                { title: this.translate.instant('USER_MENU.LOGOUT_CONFIRM'), style: ActionSheetButtonStyle.Destructive },
             ],
         });
 

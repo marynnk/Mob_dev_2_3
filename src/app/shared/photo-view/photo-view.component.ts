@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonModal, IonToolbar } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { close } from 'ionicons/icons';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-photo-view',
@@ -13,7 +14,8 @@ import { close } from 'ionicons/icons';
         IonButtons,
         IonButton,
         IonIcon,
-        IonContent
+        IonContent,
+        TranslatePipe,
     ],
     styleUrls: ['./photo-view.component.scss']
 })

@@ -3,7 +3,7 @@
         <ion-buttons slot="start">
             <ion-back-button defaultHref="/item"></ion-back-button>
         </ion-buttons>
-        <ion-title>{{ isEdit ? 'Редагування' : 'Нове завдання' }}</ion-title>
+        <ion-title>{{ (isEdit ? 'ITEM_EDIT.TITLE_EDIT' : 'ITEM_EDIT.TITLE_NEW') | translate }}</ion-title>
     </ion-toolbar>
 </ion-header>
 
@@ -16,9 +16,9 @@
                     <ion-input
                         fill="outline"
                         type="text"
-                        label="Назва завдання *"
+                        [label]="'ITEM_EDIT.TASK_LABEL' | translate"
                         labelPlacement="stacked"
-                        placeholder="Введіть назву"
+                        [placeholder]="'ITEM_EDIT.TASK_PLACEHOLDER' | translate"
                         [maxlength]="100"
                         [counter]="true"
                         formControlName="title"
@@ -32,7 +32,7 @@
                     <ion-input
                         fill="outline"
                         type="datetime-local"
-                        label="Кінцева дата"
+                        [label]="'ITEM_EDIT.DUE_LABEL' | translate"
                         labelPlacement="stacked"
                         formControlName="dueDate"
                         [min]="minDate"
@@ -45,9 +45,9 @@
                 <div class="field-group">
                     <ion-textarea
                         fill="outline"
-                        label="Опис завдання"
+                        [label]="'ITEM_EDIT.DESC_LABEL' | translate"
                         labelPlacement="stacked"
-                        placeholder="Введіть опис (необовʼязково)"
+                        [placeholder]="'ITEM_EDIT.DESC_PLACEHOLDER' | translate"
                         rows="4"
                         [maxlength]="100"
                         [counter]="true"
@@ -59,7 +59,7 @@
                 </div>
 
                 <div class="field-group photos">
-                    <div class="photos-label">Фотографії</div>
+                    <div class="photos-label">{{ 'ITEM_EDIT.PHOTOS_LABEL' | translate }}</div>
                     <app-photo-grid
                     [photos]="photos"
                     [pendingPhotos]="pendingPhotos"
@@ -75,7 +75,7 @@
                     } @else {
                         <ion-icon slot="start" name="save-outline"></ion-icon>
                     }
-                    Зберегти
+                    {{ 'ITEM_EDIT.SAVE' | translate }}
                 </ion-button>
 
             </form>

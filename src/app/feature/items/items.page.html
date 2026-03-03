@@ -1,6 +1,6 @@
 <ion-header>
     <ion-toolbar>
-        <ion-title>Мої завдання</ion-title>
+        <ion-title>{{ 'ITEMS.TITLE' | translate }}</ion-title>
         <ion-buttons slot="end">
             <app-user-menu [account]="account"/>
         </ion-buttons>
@@ -11,8 +11,8 @@
     @if (items.length === 0) {
         <div class="empty-state">
             <img src="/assets/icon/empty-state.svg" alt="Empty state"/>
-            <p class="empty-title">Завдань ще немає</p>
-            <p class="empty-subtitle">Натисніть + щоб додати перше завдання</p>
+            <p class="empty-title">{{ 'ITEMS.EMPTY_TITLE' | translate }}</p>
+            <p class="empty-subtitle">{{ 'ITEMS.EMPTY_SUBTITLE' | translate }}</p>
         </div>
     }
 
