@@ -9,7 +9,7 @@ import { Router } from '@angular/router';
 import { App } from '@capacitor/app';
 import { NotificationService } from './core/services/notification.service';
 import { TaskService } from './core/services/task.service';
-import { map, switchMap } from 'rxjs';
+import { catchError, map, of, switchMap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
@@ -44,8 +44,13 @@ export class AppComponent implements OnInit {
             } catch {}
         });
 
+        this.biometricService.suppressLock();
         this.notificationService.requestPermissions$().pipe(
-            switchMap(() => this.taskService.getItems$()),
+            catchError(() => of(undefined)),
+            switchMap(() => {
+                this.biometricService.restoreLock();
+                return this.taskService.getItems$();
+            }),
             map(items => items.filter(t => !t.completed).length),
             switchMap(count => this.notificationService.setBadge$(count)),
             takeUntilDestroyed(this.destroyRef),

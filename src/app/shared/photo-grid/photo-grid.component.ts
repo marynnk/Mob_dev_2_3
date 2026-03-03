@@ -1,10 +1,11 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { TaskPhoto } from '../../core/models/task.model';
 import { ActionSheet, ActionSheetButtonStyle } from '@capacitor/action-sheet';
-import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
+import { Camera, CameraPermissionType, CameraResultType, CameraSource } from '@capacitor/camera';
 import { IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { cameraOutline, closeCircle } from 'ionicons/icons';
+import { BiometricService } from '../../core/services/biometric.service';
 
 @Component({
     selector: 'app-photo-grid',
@@ -23,6 +24,8 @@ export class PhotoGridComponent {
     @Output() removeNewPhoto = new EventEmitter<number>();
     @Output() removeExistingPhoto = new EventEmitter<TaskPhoto>();
 
+    private readonly biometricService = inject(BiometricService);
+
     constructor() {
         addIcons({ cameraOutline, closeCircle });
     }
@@ -40,8 +43,19 @@ export class PhotoGridComponent {
         if (result.index === 2) return;
 
         const source = result.index === 0 ? CameraSource.Camera : CameraSource.Photos;
+        const permissionType: CameraPermissionType = source === CameraSource.Camera ? 'camera' : 'photos';
 
         try {
+            const currentPermissions = await Camera.checkPermissions();
+            if (currentPermissions[permissionType] !== 'granted') {
+                this.biometricService.suppressLock();
+                try {
+                    await Camera.requestPermissions({ permissions: [permissionType] });
+                } finally {
+                    this.biometricService.restoreLock();
+                }
+            }
+
             const image = await Camera.getPhoto({
                 quality: 30,
                 allowEditing: false,

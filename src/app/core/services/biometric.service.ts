@@ -19,6 +19,7 @@ export class BiometricService {
 
     readonly isLocked = signal(false);
 
+    private lockSuppressed = false;
     private failureCount = 0;
     private readonly MAX_FAILURES = 2;
     private readonly retrySubject = new Subject<void>();
@@ -44,6 +45,14 @@ export class BiometricService {
         this.retrySubject.next();
     }
 
+    suppressLock(): void {
+        this.lockSuppressed = true;
+    }
+
+    restoreLock(): void {
+        this.lockSuppressed = false;
+    }
+
     private appInactive$(): Observable<void> {
         return new Observable<void>((subscriber) => {
             let handle: PluginListenerHandle | undefined;
@@ -57,6 +66,9 @@ export class BiometricService {
     }
 
     private lockIfLoggedIn$(): Observable<void> {
+        if (this.lockSuppressed) {
+            return of(undefined);
+        }
         return from(this.auth.authStateReady()).pipe(
             switchMap(() => this.authService.isLoggedIn$.pipe(take(1))),
             tap((isLoggedIn) => {
