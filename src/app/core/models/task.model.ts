@@ -1,3 +1,9 @@
+import { LocationPoint } from './map.model';
+
+export type TaskType = 'home' | 'work' | 'study' | 'other';
+
+export const TASK_TYPES: TaskType[] = ['home', 'work', 'study', 'other'];
+
 export interface TaskPhoto {
     url: string;
     uploadedAt: string;
@@ -13,4 +19,6 @@ export interface Task {
     completed?: boolean;
     createdAt: unknown;
     photos?: TaskPhoto[];
+    type?: TaskType;
+    location?: LocationPoint
 }

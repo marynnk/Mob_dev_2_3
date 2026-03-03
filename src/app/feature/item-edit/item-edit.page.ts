@@ -4,10 +4,10 @@ import {
     IonToolbar,
     IonTitle,
     IonContent,
-    IonButtons, IonBackButton, IonButton, IonIcon, IonInput, IonTextarea, IonSpinner,
+    IonButtons, IonBackButton, IonButton, IonIcon, IonInput, IonTextarea, IonSpinner, IonSelect, IonSelectOption,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { saveOutline } from 'ionicons/icons';
+import { saveOutline, locationOutline } from 'ionicons/icons';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
     AbstractControl,
@@ -19,12 +19,14 @@ import {
 } from '@angular/forms';
 import { TaskService } from '../../core/services/task.service';
 import { NotificationService } from '../../core/services/notification.service';
-import { Task, TaskPhoto } from '../../core/models/task.model';
-import { catchError, forkJoin, from, map, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
+import { Task, TASK_TYPES, TaskPhoto } from '../../core/models/task.model';
+import { catchError, filter, forkJoin, from, map, of, Subject, switchMap, take, takeUntil, tap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { PhotoGridComponent } from '../../shared/photo-grid/photo-grid.component';
 import { PhotoViewComponent } from '../../shared/photo-view/photo-view.component';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { MapService } from '../../core/services/map.service';
+import { MapMarkerType } from '../../core/models/map.model';
 
 @Component({
     selector: 'app-edit-item',
@@ -32,7 +34,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
     styleUrls: ['item-edit.page.scss'],
     imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonBackButton,
         ReactiveFormsModule, IonButton, IonIcon, IonInput, IonTextarea, IonSpinner, PhotoGridComponent,
-        PhotoViewComponent, TranslatePipe],
+        PhotoViewComponent, TranslatePipe, IonSelect, IonSelectOption],
 })
 export class ItemEditPage {
     private destroyRef = inject(DestroyRef);
@@ -42,8 +44,11 @@ export class ItemEditPage {
     private activatedRoute = inject(ActivatedRoute);
     private tasksService = inject(TaskService);
     private notificationService = inject(NotificationService);
+    private mapService = inject(MapService);
+
     private task: Task | null = null;
     private leaveSubject = new Subject<void>();
+    protected readonly TASK_TYPES = TASK_TYPES;
 
     form = this.getForm();
     photos: TaskPhoto[] = [];
@@ -52,9 +57,10 @@ export class ItemEditPage {
     isSaving = false;
     selectedPhotoUrl: string | null = null;
     private photosInitialized = false;
+    pendingLocation = false;
 
     constructor() {
-        addIcons({ saveOutline });
+        addIcons({ saveOutline, locationOutline });
         this.destroyRef.onDestroy(() => {
             this.leaveSubject.next();
             this.leaveSubject.complete();
@@ -74,6 +80,8 @@ export class ItemEditPage {
             title: [task?.title ?? '', [Validators.required, Validators.maxLength(100)]],
             dueDate: [task?.dueDate ?? '', [Validators.required, this.futureDateValidator()]],
             description: [task?.description ?? '', [Validators.maxLength(100)]],
+            type: [task?.type ?? ''],
+            location: [task?.location],
         });
     }
 
@@ -190,6 +198,7 @@ export class ItemEditPage {
                 return of(null);
             })
         ).subscribe(result => {
+            this.isSaving = false;
             if (result !== null) {
                 this.router.navigate(['']);
             }
@@ -208,5 +217,23 @@ export class ItemEditPage {
             today.setHours(0, 0, 0, 0);
             return selected >= today ? null : { pastDate: true };
         };
+    }
+
+    openLocationPicker() {
+        if (this.pendingLocation) return;
+
+        this.pendingLocation = true;
+        const formSelectedType = this.form.get('type')?.value || '';
+        from(this.mapService.pickLocation((formSelectedType || this.task?.type) as MapMarkerType, this.form.get('location')?.value || undefined))
+            .pipe(
+                takeUntilDestroyed(this.destroyRef),
+                take(1),
+            )
+            .subscribe(location => {
+                if (location) {
+                    this.form.patchValue({ location });
+                }
+                this.pendingLocation = false;
+            });
     }
 }

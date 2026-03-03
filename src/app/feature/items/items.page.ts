@@ -1,5 +1,6 @@
 import { Component, DestroyRef, inject } from '@angular/core';
 import {
+    IonButton,
     IonButtons,
     IonContent,
     IonFab,
@@ -11,7 +12,7 @@ import {
     IonToolbar,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { add } from 'ionicons/icons';
+import { add, mapOutline } from 'ionicons/icons';
 import { Router } from '@angular/router';
 import { Task } from '../../core/models/task.model';
 import { TaskService } from '../../core/services/task.service';
@@ -25,6 +26,8 @@ import { TaskItemComponent } from '../../shared/task-item/task-item.component';
 import { NotificationService } from '../../core/services/notification.service';
 import { UserMenuComponent } from '../../shared/user-menu/user-menu.component';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { MapService } from '../../core/services/map.service';
+import { MapPoint } from '../../core/models/map.model';
 
 @Component({
     selector: 'app-home',
@@ -41,7 +44,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
         IonButtons,
         TaskItemComponent,
         UserMenuComponent,
-        TranslatePipe],
+        TranslatePipe, IonButton],
 })
 export class ItemsPage {
     private destroyRef = inject(DestroyRef);
@@ -50,12 +53,13 @@ export class ItemsPage {
     private tasksService = inject(TaskService);
     private accountService = inject(AccountService);
     private notificationService = inject(NotificationService);
+    private mapService = inject(MapService);
 
     items: Array<Task> = [];
     account: Profile | null = null;
 
     constructor() {
-        addIcons({ add });
+        addIcons({ add, mapOutline });
 
         this.tasksService.getItems$()
             .pipe(takeUntilDestroyed(this.destroyRef))
@@ -106,5 +110,13 @@ export class ItemsPage {
 
     editTask(task: Task) {
         this.router.navigate(['/item', task.id]);
+    }
+
+    getMapItems() {
+        return this.items.filter(item => item.location).map(item => item as MapPoint);
+    }
+
+    protected openItemsMapModal() {
+        this.mapService.showPoints(this.getMapItems());
     }
 }

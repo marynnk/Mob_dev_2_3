@@ -1,0 +1,52 @@
+<ion-header>
+    <ion-toolbar>
+        <ion-title>{{ (mode === 'pick' ? 'MAP.TITLE_PICK' : 'MAP.TITLE_VIEW') | translate }}</ion-title>
+        <ion-buttons slot="end">
+            <ion-button fill="clear" (click)="close()">
+                <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+            </ion-button>
+        </ion-buttons>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content [scrollY]="false">
+    <div #mapRef class="map-element"></div>
+
+    @if (loading) {
+        <div class="map-overlay">
+            <ion-spinner name="crescent"></ion-spinner>
+        </div>
+    }
+
+    @if (error) {
+        <div class="map-overlay map-error">
+            <span>{{ error }}</span>
+        </div>
+    }
+
+    @if (mode === 'pick' && !loading && !error) {
+        <div class="map-pin" aria-hidden="true">
+            <img [src]="resolvePointer(markerType)" width="30"/>
+        </div>
+    }
+</ion-content>
+
+@if (mode === 'pick') {
+    <ion-footer>
+        <ion-toolbar>
+            <ion-button
+                expand="block"
+                class="ion-margin"
+                [disabled]="loading || confirming"
+                (click)="confirm()"
+            >
+                @if (confirming) {
+                    <ion-spinner slot="start" name="crescent"></ion-spinner>
+                } @else {
+                    <ion-icon slot="start" name="checkmark-outline"></ion-icon>
+                }
+                {{ 'MAP.CONFIRM' | translate }}
+            </ion-button>
+        </ion-toolbar>
+    </ion-footer>
+}

@@ -95,6 +95,10 @@
         "TASK_PLACEHOLDER": "Введіть назву",
         "DUE_LABEL": "Кінцева дата",
         "DESC_LABEL": "Опис завдання",
+        "TYPE_LABEL": "Тип завдання",
+        "LOCATION_LABEL": "Місце",
+        "LOCATION_PLACEHOLDER": "Оберіть місце (необовʼязково)",
+        "TYPE_PLACEHOLDER": "Оберіть тип завдання",
         "DESC_PLACEHOLDER": "Введіть опис (необовʼязково)",
         "PHOTOS_LABEL": "Фотографії",
         "SAVE": "Зберегти"
@@ -121,5 +125,17 @@
     "NOTIFICATIONS": {
         "TASK_DUE_TITLE": "Завдання \"{{title}}\" збігає за {{hours}} год.",
         "TASK_DUE_BODY": "Завдання очікує на виконання"
+    },
+    "MAP": {
+        "TITLE_VIEW": "Задачі на карті",
+        "TITLE_PICK": "Оберіть місце",
+        "CONFIRM": "Підтвердити",
+        "LOAD_ERROR": "Не вдалося завантажити карту"
+    },
+    "TASK_TYPE": {
+        "HOME": "Дім",
+        "WORK": "Робота",
+        "STUDY": "Навчання",
+        "OTHER": "Інше"
     }
 }

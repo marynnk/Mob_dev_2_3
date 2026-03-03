@@ -95,6 +95,10 @@
         "TASK_PLACEHOLDER": "Enter name",
         "DUE_LABEL": "Due date",
         "DESC_LABEL": "Task description",
+        "TYPE_LABEL": "Task type",
+        "TYPE_PLACEHOLDER": "Select task type",
+        "LOCATION_LABEL": "Location",
+        "LOCATION_PLACEHOLDER": "Enter location (optional)",
         "DESC_PLACEHOLDER": "Enter description (optional)",
         "PHOTOS_LABEL": "Photos",
         "SAVE": "Save"
@@ -121,5 +125,17 @@
     "NOTIFICATIONS": {
         "TASK_DUE_TITLE": "Task \"{{title}}\" will be expired within {{hours}} hours.",
         "TASK_DUE_BODY": "Task is due to be done"
+    },
+    "MAP": {
+        "TITLE_VIEW": "Tasks on map",
+        "TITLE_PICK": "Pick location",
+        "CONFIRM": "Select",
+        "LOAD_ERROR": "Could not load map. Please try again later"
+    },
+    "TASK_TYPE": {
+        "HOME": "Home",
+        "WORK": "Work",
+        "STUDY": "Study",
+        "OTHER": "Other"
     }
 }

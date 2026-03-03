@@ -43,6 +43,30 @@
                 </div>
 
                 <div class="field-group">
+                    <ion-select formControlName="type" [label]="'ITEM_EDIT.TYPE_LABEL' | translate" label-placement="stacked"
+                                interface="popover" [placeholder]="'ITEM_EDIT.TYPE_PLACEHOLDER' | translate">
+                        @for(type of TASK_TYPES; track type) {
+                            <ion-select-option value="{{type}}">{{`TASK_TYPE.${type.toUpperCase()}` | translate}}</ion-select-option>
+                        }
+                    </ion-select>
+                </div>
+
+                <div class="field-group">
+                    <ion-input
+                        fill="outline"
+                        type="text"
+                        [label]="'ITEM_EDIT.LOCATION_LABEL' | translate"
+                        labelPlacement="stacked"
+                        [placeholder]="'ITEM_EDIT.LOCATION_PLACEHOLDER' | translate"
+                        (click)="openLocationPicker()"
+                        [value]="form.get('location')?.value?.address"
+                        readonly
+                    >
+                        <ion-icon slot="end" name="location-outline" aria-hidden="true" size="small"/>
+                    </ion-input>
+                </div>
+
+                <div class="field-group">
                     <ion-textarea
                         fill="outline"
                         [label]="'ITEM_EDIT.DESC_LABEL' | translate"
@@ -61,12 +85,12 @@
                 <div class="field-group photos">
                     <div class="photos-label">{{ 'ITEM_EDIT.PHOTOS_LABEL' | translate }}</div>
                     <app-photo-grid
-                    [photos]="photos"
-                    [pendingPhotos]="pendingPhotos"
-                    (openPhoto)="openPhoto($event)"
-                    (addPhoto)="addPhoto($event)"
-                    (removeNewPhoto)="removePendingPhoto($event)"
-                    (removeExistingPhoto)="removeExistingPhoto($event)"/>
+                        [photos]="photos"
+                        [pendingPhotos]="pendingPhotos"
+                        (openPhoto)="openPhoto($event)"
+                        (addPhoto)="addPhoto($event)"
+                        (removeNewPhoto)="removePendingPhoto($event)"
+                        (removeExistingPhoto)="removeExistingPhoto($event)"/>
                 </div>
 
                 <ion-button expand="block" type="submit" class="submit-btn" [disabled]="isSaving">

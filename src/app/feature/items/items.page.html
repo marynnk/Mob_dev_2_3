@@ -1,5 +1,10 @@
 <ion-header>
     <ion-toolbar>
+        <ion-buttons slot="start">
+            <ion-button size="small" (click)="openItemsMapModal()">
+                <ion-icon slot="icon-only" name="map-outline"></ion-icon>
+            </ion-button>
+        </ion-buttons>
         <ion-title>{{ 'ITEMS.TITLE' | translate }}</ion-title>
         <ion-buttons slot="end">
             <app-user-menu [account]="account"/>

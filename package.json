@@ -27,6 +27,8 @@
     "@capacitor/app": "8.0.1",
     "@capacitor/camera": "^8.0.1",
     "@capacitor/core": "8.1.0",
+    "@capacitor/geolocation": "^8.1.0",
+    "@capacitor/google-maps": "^8.0.1",
     "@capacitor/haptics": "8.0.1",
     "@capacitor/ios": "^8.1.0",
     "@capacitor/keyboard": "8.0.1",
