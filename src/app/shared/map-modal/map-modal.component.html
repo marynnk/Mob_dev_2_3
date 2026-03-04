@@ -9,8 +9,8 @@
     </ion-toolbar>
 </ion-header>
 
-<ion-content [scrollY]="false">
-    <div #mapRef class="map-element"></div>
+<div class="map-wrapper">
+    <capacitor-google-map #mapRef class="map-element"></capacitor-google-map>
 
     @if (loading) {
         <div class="map-overlay">
@@ -46,7 +46,7 @@
             }
         </div>
     }
-</ion-content>
+</div>
 
 @if (mode === 'pick') {
     <ion-footer>

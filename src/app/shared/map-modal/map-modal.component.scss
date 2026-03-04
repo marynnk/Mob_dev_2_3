@@ -4,11 +4,13 @@
     height: 100%;
 }
 
-ion-content {
-    --background: transparent;
-    --overflow: hidden;
+.map-wrapper {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
 }
 
+capacitor-google-map,
 .map-element {
     width: 100%;
     height: 100%;

@@ -1,10 +1,9 @@
-import { Component, ElementRef, inject, Input, OnDestroy, ViewChild } from '@angular/core';
+import { Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, inject, Input, NgZone, OnDestroy, ViewChild } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { ModalController } from '@ionic/angular';
 import {
     IonButton,
     IonButtons,
-    IonContent,
     IonFooter,
     IonHeader,
     IonIcon,
@@ -23,6 +22,7 @@ import { closeOutline, checkmarkOutline, calendarOutline, locationOutline } from
 import { LatLng, MapMarkerType, MapPoint, LocationPoint } from '../../core/models/map.model';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { environment } from '../../../environments/environment';
+import { BiometricService } from '../../core/services/biometric.service';
 
 const DEFAULT_LOCATION: LatLng = { lat: 50.4501, lng: 30.5234 };
 const DEFAULT_ZOOM = 15;
@@ -35,19 +35,22 @@ export type DistanceFilter = '500' | '1000' | '5000' | 'all';
     styleUrls: ['./map-modal.component.scss'],
     imports: [
         IonHeader, IonToolbar, IonTitle, IonButtons, IonButton,
-        IonIcon, IonContent, IonFooter, IonSpinner, IonSegment,
+        IonIcon, IonFooter, IonSpinner, IonSegment,
         IonSegmentButton, IonLabel, TranslatePipe, DatePipe,
     ],
+    schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class MapModalComponent implements OnDestroy {
     @Input() mode: 'view' | 'pick' = 'view';
     @Input() points: MapPoint[] = [];
     @Input() markerType?: MapMarkerType;
     @Input() initialLocation?: LatLng;
-    @ViewChild('mapRef') private mapRef!: ElementRef<HTMLDivElement>;
+    @ViewChild('mapRef') private mapRef!: ElementRef<HTMLElement>;
 
     private readonly modalCtrl = inject(ModalController);
     private readonly translate = inject(TranslateService);
+    private readonly biometricService = inject(BiometricService);
+    private readonly ngZone = inject(NgZone);
     private map: GoogleMap | null = null;
     private markerPointMap = new Map<string, MapPoint>();
     private userLocation: LatLng | null = null;
@@ -64,7 +67,7 @@ export class MapModalComponent implements OnDestroy {
     }
 
     async ionViewDidEnter(): Promise<void> {
-        await new Promise(r => setTimeout(r, 150));
+        await new Promise(r => setTimeout(r, 300));
         await this.initMap();
     }
 
@@ -73,13 +76,20 @@ export class MapModalComponent implements OnDestroy {
         const language = this.translate.getCurrentLang();
         if (!el) return;
 
+        const rect = el.getBoundingClientRect();
+        const w = rect.width || window.innerWidth;
+        const h = rect.height || this.getFallbackMapHeight();
+        el.style.width = `${w}px`;
+        el.style.height = `${h}px`;
+
         try {
             let center: LatLng = DEFAULT_LOCATION;
+            let zoom = DEFAULT_ZOOM;
 
             if (this.mode === 'pick') {
                 center = this.initialLocation ?? await this.getCurrentLocation() ?? DEFAULT_LOCATION;
             } else if (this.points.length > 0) {
-                center = this.calcCenter(this.points.map(p => p.location));
+                ({ center, zoom } = this.getFitCamera(this.points.map(p => p.location)));
             }
 
             this.centerLocation = center;
@@ -90,7 +100,7 @@ export class MapModalComponent implements OnDestroy {
                 apiKey: environment.googleMapsApiKey,
                 config: {
                     center: { lat: center.lat, lng: center.lng },
-                    zoom: DEFAULT_ZOOM,
+                    zoom,
                 },
                 language,
             });
@@ -104,17 +114,23 @@ export class MapModalComponent implements OnDestroy {
 
                 await this.map.setOnMarkerClickListener(({ markerId }) => {
                     const point = this.markerPointMap.get(markerId);
-                    this.selectedPoint = point ?? null;
+                    this.ngZone.run(() => {
+                        this.selectedPoint = point ?? null;
+                    });
                 });
 
                 await this.map.setOnMapClickListener(() => {
-                    this.selectedPoint = null;
+                    this.ngZone.run(() => {
+                        this.selectedPoint = null;
+                    });
                 });
             }
 
             if (this.mode === 'pick') {
                 await this.map.setOnCameraIdleListener(({ latitude, longitude }) => {
-                    this.centerLocation = { lat: latitude, lng: longitude };
+                    this.ngZone.run(() => {
+                        this.centerLocation = { lat: latitude, lng: longitude };
+                    });
                 });
             }
 
@@ -126,8 +142,26 @@ export class MapModalComponent implements OnDestroy {
         }
     }
 
+    private getFallbackMapHeight(): number {
+        const headerEl = this.mapRef.nativeElement.closest('ion-modal')?.querySelector('ion-header');
+        const footerEl = this.mapRef.nativeElement.closest('ion-modal')?.querySelector('ion-footer');
+        const headerH = headerEl ? headerEl.getBoundingClientRect().height : 56;
+        const footerH = footerEl ? footerEl.getBoundingClientRect().height : 0;
+        return window.innerHeight - headerH - footerH;
+    }
+
     private async getCurrentLocation(): Promise<LatLng | null> {
         try {
+            const permissions = await Geolocation.checkPermissions();
+            if (permissions.location !== 'granted') {
+                this.biometricService.suppressLock();
+                try {
+                    await Geolocation.requestPermissions({ permissions: ['location'] });
+                } finally {
+                    this.biometricService.restoreLock();
+                }
+            }
+
             const pos = await Geolocation.getCurrentPosition({ timeout: 10000 });
             return { lat: pos.coords.latitude, lng: pos.coords.longitude };
         } catch {
@@ -135,14 +169,7 @@ export class MapModalComponent implements OnDestroy {
         }
     }
 
-    private calcCenter(locations: LatLng[]): LatLng {
-        return {
-            lat: locations.reduce((s, l) => s + l.lat, 0) / locations.length,
-            lng: locations.reduce((s, l) => s + l.lng, 0) / locations.length,
-        };
-    }
-
-    private async renderPoints(points: MapPoint[]): Promise<void> {
+    private async renderPoints(points: MapPoint[], fitCamera = false): Promise<void> {
         if (!this.map) return;
 
         this.markerPointMap.clear();
@@ -158,8 +185,10 @@ export class MapModalComponent implements OnDestroy {
         const ids = await this.map.addMarkers(markers);
         ids.forEach((id, i) => this.markerPointMap.set(id, points[i]));
 
-        const { center, zoom } = this.getFitCamera(points.map(p => p.location));
-        await this.map.setCamera({ coordinate: center, zoom, animate: true });
+        if (fitCamera) {
+            const { center, zoom } = this.getFitCamera(points.map(p => p.location));
+            await this.map.setCamera({ coordinate: center, zoom, animate: true });
+        }
     }
 
     private getFitCamera(locations: LatLng[]): { center: LatLng; zoom: number } {
@@ -207,7 +236,7 @@ export class MapModalComponent implements OnDestroy {
 
         const filtered = this.filterByDistance(this.points);
         if (filtered.length > 0) {
-            await this.renderPoints(filtered);
+            await this.renderPoints(filtered, true);
         }
     }
 

@@ -37,6 +37,10 @@
 	<string>Фото для завдання</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>Для доступу до даних</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Для локації завдання</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Для локації завдання</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>Фото для завдання</string>
 	<key>NSPhotoLibraryUsageDescription</key>

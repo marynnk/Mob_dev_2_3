@@ -8,6 +8,9 @@ const config: CapacitorConfig = {
         iosScheme: 'https',
         hostname: 'localhost',
     },
+    ios: {
+        backgroundColor: '#00000000',
+    },
 };
 
 export default config;
