@@ -8,11 +8,15 @@ import { TranslateService } from '@ngx-translate/core';
 @Injectable({ providedIn: 'root' })
 export class NotificationService {
     private translate = inject(TranslateService);
-    private hourMilliseconds = 1000 * 60 * 60;
-    private notifyHoursBefore = 1 * this.hourMilliseconds;
 
     private notificationId(taskId: number): number {
         return Math.abs(taskId % 2147483647);
+    }
+
+    private notifyLabel(minutes: number): string {
+        if (minutes < 60) return `${minutes} min`;
+        if (minutes < 1440) return `${minutes / 60} h`;
+        return `${minutes / 1440} d`;
     }
 
     requestPermissions$(): Observable<void> {
@@ -26,17 +30,19 @@ export class NotificationService {
         const id = this.notificationId(task.id);
         return from(LocalNotifications.cancel({ notifications: [{ id }] })).pipe(
             switchMap(() => {
-                if (task.completed || !task.dueDate) {
+                if (task.completed || !task.dueDate || !task.notifyBefore) {
                     return of(undefined);
                 }
-                const at = new Date(new Date(task.dueDate).getTime() - this.notifyHoursBefore);
+                const notifyMs = task.notifyBefore * 60_000;
+                const at = new Date(new Date(task.dueDate).getTime() - notifyMs);
                 if (at <= new Date()) {
                     return of(undefined);
                 }
+                const label = this.notifyLabel(task.notifyBefore);
                 return from(LocalNotifications.schedule({
                     notifications: [{
                         id,
-                        title: this.translate.instant('NOTIFICATIONS.TASK_DUE_TITLE', { title: task.title, hours: this.notifyHoursBefore / this.hourMilliseconds }),
+                        title: this.translate.instant('NOTIFICATIONS.TASK_DUE_TITLE', { title: task.title, hours: label }),
                         body: task.description ?? this.translate.instant('NOTIFICATIONS.TASK_DUE_BODY'),
                         schedule: { at },
                     }],

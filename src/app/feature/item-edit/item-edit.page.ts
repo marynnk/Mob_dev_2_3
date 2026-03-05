@@ -19,7 +19,7 @@ import {
 } from '@angular/forms';
 import { TaskService } from '../../core/services/task.service';
 import { NotificationService } from '../../core/services/notification.service';
-import { Task, TASK_TYPES, TaskPhoto } from '../../core/models/task.model';
+import { NOTIFY_BEFORE_OPTIONS, NotifyBefore, Task, TASK_TYPES, TaskPhoto } from '../../core/models/task.model';
 import { catchError, filter, forkJoin, from, map, of, Subject, switchMap, take, takeUntil, tap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { PhotoGridComponent } from '../../shared/photo-grid/photo-grid.component';
@@ -49,6 +49,7 @@ export class ItemEditPage {
     private task: Task | null = null;
     private leaveSubject = new Subject<void>();
     protected readonly TASK_TYPES = TASK_TYPES;
+    protected readonly NOTIFY_BEFORE_OPTIONS = NOTIFY_BEFORE_OPTIONS;
 
     form = this.getForm();
     photos: TaskPhoto[] = [];
@@ -82,6 +83,7 @@ export class ItemEditPage {
             description: [task?.description ?? '', [Validators.maxLength(100)]],
             type: [task?.type ?? ''],
             location: [task?.location],
+            notifyBefore: [task?.notifyBefore ?? null as NotifyBefore | null],
         });
     }
 
@@ -175,10 +177,21 @@ export class ItemEditPage {
             takeUntilDestroyed(this.destroyRef),
             switchMap(([newPhotos]) => {
                 const allPhotos = [...this.photos, ...newPhotos];
+                const raw = this.form.getRawValue();
+                const notifyBefore = raw.notifyBefore as NotifyBefore | null;
+                const dueDate = raw.dueDate;
+
+                const notifyAt = notifyBefore && dueDate
+                    ? new Date(dueDate as unknown as string).getTime() - notifyBefore * 60_000
+                    : null;
+
                 const taskData = {
-                    ...this.form.getRawValue() as unknown as Task,
+                    ...raw as unknown as Task,
                     photos: allPhotos,
                     id: taskId,
+                    notifyBefore,
+                    notifyAt,
+                    notificationSent: false,
                 };
                 const save$ = this.isEdit
                     ? this.tasksService.updateTask$(this.task!, taskData)
@@ -235,5 +248,17 @@ export class ItemEditPage {
                 }
                 this.pendingLocation = false;
             });
+    }
+
+    notifyBeforeKey(value: NotifyBefore | null): string {
+        if (!value) return 'NOTIFY_BEFORE.NONE';
+        const map: Record<number, string> = {
+            30: 'NOTIFY_BEFORE.MIN_30',
+            60: 'NOTIFY_BEFORE.HOUR_1',
+            120: 'NOTIFY_BEFORE.HOUR_2',
+            480: 'NOTIFY_BEFORE.HOUR_8',
+            1440: 'NOTIFY_BEFORE.DAY_1',
+        };
+        return map[value] ?? 'NOTIFY_BEFORE.NONE';
     }
 }

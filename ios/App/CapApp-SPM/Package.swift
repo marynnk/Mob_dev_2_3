@@ -24,7 +24,8 @@ let package = Package(
         .package(name: "CapacitorNetwork", path: "../../../node_modules/@capacitor/network"),
         .package(name: "CapacitorPrivacyScreen", path: "../../../node_modules/@capacitor/privacy-screen"),
         .package(name: "CapacitorStatusBar", path: "../../../node_modules/@capacitor/status-bar"),
-        .package(name: "CapawesomeCapacitorBadge", path: "../../../node_modules/@capawesome/capacitor-badge")
+        .package(name: "CapawesomeCapacitorBadge", path: "../../../node_modules/@capawesome/capacitor-badge"),
+        .package(name: "OnesignalCordovaPlugin", path: "../../capacitor-cordova-ios-plugins/sources/OnesignalCordovaPlugin")
     ],
     targets: [
         .target(
@@ -44,7 +45,8 @@ let package = Package(
                 .product(name: "CapacitorNetwork", package: "CapacitorNetwork"),
                 .product(name: "CapacitorPrivacyScreen", package: "CapacitorPrivacyScreen"),
                 .product(name: "CapacitorStatusBar", package: "CapacitorStatusBar"),
-                .product(name: "CapawesomeCapacitorBadge", package: "CapawesomeCapacitorBadge")
+                .product(name: "CapawesomeCapacitorBadge", package: "CapawesomeCapacitorBadge"),
+                .product(name: "OnesignalCordovaPlugin", package: "OnesignalCordovaPlugin")
             ]
         )
     ]

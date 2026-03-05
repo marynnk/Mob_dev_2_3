@@ -101,6 +101,8 @@
         "LOCATION_PLACEHOLDER": "Enter location (optional)",
         "DESC_PLACEHOLDER": "Enter description (optional)",
         "PHOTOS_LABEL": "Photos",
+        "NOTIFY_LABEL": "Notify before due",
+        "NOTIFY_PLACEHOLDER": "Don't notify",
         "SAVE": "Save"
     },
     "TASK_ITEM": {
@@ -138,5 +140,13 @@
         "WORK": "Work",
         "STUDY": "Study",
         "OTHER": "Other"
+    },
+    "NOTIFY_BEFORE": {
+        "NONE": "Don't notify",
+        "MIN_30": "30 minutes",
+        "HOUR_1": "1 hour",
+        "HOUR_2": "2 hours",
+        "HOUR_8": "8 hours",
+        "DAY_1": "1 day"
     }
 }

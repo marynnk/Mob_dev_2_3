@@ -67,6 +67,20 @@
                 </div>
 
                 <div class="field-group">
+                    <ion-select
+                        formControlName="notifyBefore"
+                        [label]="'ITEM_EDIT.NOTIFY_LABEL' | translate"
+                        label-placement="stacked"
+                        interface="popover"
+                        [placeholder]="'ITEM_EDIT.NOTIFY_PLACEHOLDER' | translate"
+                    >
+                        @for (option of NOTIFY_BEFORE_OPTIONS; track option) {
+                            <ion-select-option [value]="option">{{ notifyBeforeKey(option) | translate }}</ion-select-option>
+                        }
+                    </ion-select>
+                </div>
+
+                <div class="field-group">
                     <ion-textarea
                         fill="outline"
                         [label]="'ITEM_EDIT.DESC_LABEL' | translate"

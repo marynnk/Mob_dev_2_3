@@ -10,6 +10,9 @@ export interface TaskPhoto {
     storagePath: string;
 }
 
+export type NotifyBefore = 30 | 60 | 120 | 480 | 1440;
+export const NOTIFY_BEFORE_OPTIONS: Array<NotifyBefore | null> = [null, 30, 60, 120, 480, 1440];
+
 export interface Task {
     id: number;
     title: string;
@@ -20,5 +23,8 @@ export interface Task {
     createdAt: unknown;
     photos?: TaskPhoto[];
     type?: TaskType;
-    location?: LocationPoint
+    location?: LocationPoint;
+    notifyBefore?: NotifyBefore | null;
+    notifyAt?: number | null;
+    notificationSent?: boolean;
 }

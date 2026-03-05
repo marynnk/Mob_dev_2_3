@@ -9,4 +9,5 @@ export const environment = {
         appId: "1:855445469823:web:4341c2ac11f585a8519d4a"
     },
     googleMapsApiKey: 'AIzaSyDU6sOjJaNActmDbKVXokmrfHDCfRV-WVA',
+    oneSignalAppId: 'fed9a9df-429b-4496-b15f-15869f233987',
 };

@@ -13,6 +13,7 @@ import { catchError, map, of, switchMap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { SettingsService } from './core/services/settings.servce';
+import { PushService } from './core/services/push.service';
 
 @Component({
     selector: 'app-root',
@@ -27,6 +28,7 @@ export class AppComponent implements OnInit {
     private readonly notificationService = inject(NotificationService);
     private readonly taskService = inject(TaskService);
     private readonly destroyRef = inject(DestroyRef);
+    private readonly pushService = inject(PushService);
     private translate = inject(TranslateService);
     private settings = inject(SettingsService);
 
@@ -56,6 +58,7 @@ export class AppComponent implements OnInit {
             catchError(() => of(undefined)),
             switchMap(() => {
                 this.biometricService.restoreLock();
+                void this.pushService.init();
                 return this.taskService.getItems$();
             }),
             map(items => items.filter(t => !t.completed).length),
