@@ -37,21 +37,10 @@ exports.sendDueNotifications = void 0;
 const admin = __importStar(require("firebase-admin"));
 const scheduler_1 = require("firebase-functions/v2/scheduler");
 const params_1 = require("firebase-functions/params");
-// Secrets — set via: firebase functions:secrets:set ONESIGNAL_REST_API_KEY
-//                    firebase functions:secrets:set ONESIGNAL_APP_ID
 const ONESIGNAL_REST_API_KEY = (0, params_1.defineSecret)('ONESIGNAL_REST_API_KEY');
 const ONESIGNAL_APP_ID_SECRET = (0, params_1.defineSecret)('ONESIGNAL_APP_ID');
 admin.initializeApp();
 const db = admin.firestore();
-/**
- * Runs every minute. Queries tasks where:
- *   - notifyAt <= now (the scheduled time has passed)
- *   - notifyAt != null (has a notification scheduled)
- *   - notificationSent == false (not yet sent)
- *
- * For each matching task, sends a OneSignal push to the user's
- * registered device subscription IDs and marks notificationSent = true.
- */
 exports.sendDueNotifications = (0, scheduler_1.onSchedule)({
     schedule: 'every 1 minutes',
     secrets: [ONESIGNAL_REST_API_KEY, ONESIGNAL_APP_ID_SECRET],
@@ -71,13 +60,11 @@ exports.sendDueNotifications = (0, scheduler_1.onSchedule)({
     const appId = ONESIGNAL_APP_ID_SECRET.value();
     for (const taskDoc of snap.docs) {
         const task = taskDoc.data();
-        // Skip tasks without a userId
         if (!task['userId']) {
             console.warn(`[sendDueNotifications] Task ${taskDoc.id} has no userId, skipping.`);
             await taskDoc.ref.update({ notificationSent: true });
             continue;
         }
-        // Fetch the user's OneSignal subscription IDs
         const userDoc = await db.doc(`users/${task['userId']}`).get();
         const oneSignalIds = userDoc.exists
             ? ((_b = (_a = userDoc.data()) === null || _a === void 0 ? void 0 : _a['oneSignalIds']) !== null && _b !== void 0 ? _b : [])
@@ -87,7 +74,6 @@ exports.sendDueNotifications = (0, scheduler_1.onSchedule)({
             await taskDoc.ref.update({ notificationSent: true });
             continue;
         }
-        // Send push notification via OneSignal REST API
         try {
             const body = {
                 app_id: appId,
@@ -100,6 +86,7 @@ exports.sendDueNotifications = (0, scheduler_1.onSchedule)({
                     en: task['description'] || 'Check your task list',
                     uk: task['description'] || 'Перегляньте список завдань',
                 },
+                data: { taskId: taskDoc.id },
             };
             const response = await fetch('https://onesignal.com/api/v1/notifications', {
                 method: 'POST',
@@ -120,7 +107,6 @@ exports.sendDueNotifications = (0, scheduler_1.onSchedule)({
         catch (err) {
             console.error(`[sendDueNotifications] Fetch failed for task ${taskDoc.id}:`, err);
         }
-        // Mark notification as sent regardless of push success to avoid infinite retries
         await taskDoc.ref.update({ notificationSent: true });
     }
 });

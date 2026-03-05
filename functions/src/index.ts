@@ -63,6 +63,7 @@ export const sendDueNotifications = onSchedule(
                         en: (task['description'] as string | undefined) || 'Check your task list',
                         uk: (task['description'] as string | undefined) || 'Перегляньте список завдань',
                     },
+                    data: { taskId: taskDoc.id },
                 };
 
                 const response = await fetch('https://onesignal.com/api/v1/notifications', {
