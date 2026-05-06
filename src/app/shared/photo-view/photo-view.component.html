@@ -1,0 +1,23 @@
+<ion-modal
+    [isOpen]="!!isOpen"
+    [backdropDismiss]="true"
+    (didDismiss)="closePhoto()"
+    class="photo-viewer-modal"
+>
+    <ng-template>
+        <ion-header>
+            <ion-toolbar>
+                <ion-buttons slot="end">
+                    <ion-button (click)="closePhoto()">
+                        <ion-icon slot="icon-only" name="close"></ion-icon>
+                    </ion-button>
+                </ion-buttons>
+            </ion-toolbar>
+        </ion-header>
+        <ion-content>
+            <div class="photo-viewer-wrap">
+                <img [src]="photoUrl" class="photo-viewer-img" alt="Фото" />
+            </div>
+        </ion-content>
+    </ng-template>
+</ion-modal>

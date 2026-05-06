@@ -1,32 +1,37 @@
 import { Component, DestroyRef, inject } from '@angular/core';
 import {
-    IonHeader,
-    IonToolbar,
-    IonTitle,
+    IonButton,
+    IonButtons,
     IonContent,
     IonFab,
     IonFabButton,
+    IonHeader,
     IonIcon,
-    IonList, IonItemSliding, IonItem, IonLabel, IonItemOptions, IonItemOption,
-    IonButton, IonButtons,
+    IonLabel,
+    IonList,
+    IonTitle,
+    IonToolbar,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { add, checkmarkCircle, radioButtonOff, logOutOutline, trashOutline, createOutline } from 'ionicons/icons';
+import { add, logOutOutline } from 'ionicons/icons';
 import { Router } from '@angular/router';
 import { Task } from '../../core/models/task.model';
 import { TaskService } from '../../core/services/task.service';
 import { AuthService } from '../../core/services/auth.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { filter, firstValueFrom } from 'rxjs';
+import { filter, from, map, switchMap } from 'rxjs';
 import { Profile } from '../../core/models/profile.model';
 import { AccountService } from '../../core/services/account.service';
+import { Haptics, NotificationType } from '@capacitor/haptics';
+import { ActionSheet, ActionSheetButtonStyle } from '@capacitor/action-sheet';
+import { TaskItemComponent } from '../../shared/task-item/task-item.component';
+import { NotificationService } from '../../core/services/notification.service';
 
 @Component({
     selector: 'app-home',
     templateUrl: 'items.page.html',
     styleUrls: ['items.page.scss'],
-    imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonFab, IonFabButton, IonIcon, IonList, IonItemSliding,
-        IonItem, IonLabel, IonItemOptions, IonItemOption, IonButton, IonButtons],
+    imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonFab, IonFabButton, IonIcon, IonList, IonLabel, IonButton, IonButtons, TaskItemComponent],
 })
 export class ItemsPage {
     private destroyRef = inject(DestroyRef);
@@ -34,12 +39,13 @@ export class ItemsPage {
     private authService = inject(AuthService);
     private tasksService = inject(TaskService);
     private accountService = inject(AccountService);
+    private notificationService = inject(NotificationService);
 
     items: Array<Task> = [];
     account: Profile | null = null;
 
     constructor() {
-        addIcons({ add, checkmarkCircle, radioButtonOff, logOutOutline, trashOutline, createOutline });
+        addIcons({ add, logOutOutline });
 
         this.tasksService.getItems$()
             .pipe(takeUntilDestroyed(this.destroyRef))
@@ -56,20 +62,40 @@ export class ItemsPage {
 
     async logout() {
         await this.authService.logout();
-        await firstValueFrom(this.authService.user$.pipe(filter(u => !u)));
-        this.router.navigate(['/login']);
     }
 
-    toggleTask(task: Task, slidingItem: IonItemSliding) {
-        this.tasksService.updateTask$(task, { completed: !task.completed })
-            .pipe(takeUntilDestroyed(this.destroyRef))
-            .subscribe(() => slidingItem.close());
+    toggleTask(task: Task) {
+        const updated = { ...task, completed: !task.completed };
+        this.tasksService.updateTask$(task, { completed: updated.completed }).pipe(
+            takeUntilDestroyed(this.destroyRef),
+            switchMap(() => this.notificationService.syncTaskNotification$(updated)),
+        ).subscribe(() => Haptics.notification({ type: NotificationType.Success }));
     }
 
-    deleteTask(task: Task, slidingItem: IonItemSliding) {
-        this.tasksService.removeItem$(task)
-            .pipe(takeUntilDestroyed(this.destroyRef))
-            .subscribe(() => slidingItem.close());
+    confirmTaskDeletion(task: Task) {
+        return from(Haptics.notification({ type: NotificationType.Error })).pipe(
+            switchMap(() => ActionSheet.showActions({
+                title: 'Дійсно видалити задачу?',
+                message: task.title,
+                options: [
+                    { title: 'Ні', },
+                    {
+                        title: 'Так',
+                        style: ActionSheetButtonStyle.Destructive,
+                    },
+                ],
+            })),
+            map(({ index }) => index === 1)
+        )
+    }
+
+    deleteTask(task: Task) {
+        this.confirmTaskDeletion(task).pipe(
+            takeUntilDestroyed(this.destroyRef),
+            filter(Boolean),
+            switchMap(() => this.tasksService.removeItem$(task)),
+            switchMap(() => this.notificationService.cancelTaskNotification$(task.id)),
+        ).subscribe(() => Haptics.notification({ type: NotificationType.Success }));
     }
 
     editTask(task: Task) {

@@ -6,7 +6,7 @@ import {
     IonButton,
     IonIcon,
     IonInput,
-    IonSpinner,
+    IonSpinner, IonInputPasswordToggle,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { eyeOutline, eyeOffOutline, mailOutline, lockClosedOutline, enterOutline } from 'ionicons/icons';
@@ -17,7 +17,7 @@ import { filter, firstValueFrom } from 'rxjs';
     selector: 'app-login',
     templateUrl: 'login.page.html',
     styleUrls: ['login.page.scss'],
-    imports: [IonContent, IonButton, IonIcon, IonInput, IonSpinner, ReactiveFormsModule],
+    imports: [IonContent, IonButton, IonIcon, IonInput, IonSpinner, ReactiveFormsModule, IonInputPasswordToggle],
 })
 export class LoginPage {
     private readonly fb = inject(FormBuilder);
@@ -26,7 +26,6 @@ export class LoginPage {
 
     loading = false;
     error = '';
-    showPassword = false;
 
     readonly form = this.fb.nonNullable.group({
         email: ['', [Validators.required, Validators.email]],
@@ -78,6 +77,10 @@ export class LoginPage {
 
     goToRegister(): void {
         void this.router.navigate(['/register']);
+    }
+
+    goToForgotPassword(): void {
+        void this.router.navigate(['/forgot-password']);
     }
 
     private mapError(err: unknown): string {

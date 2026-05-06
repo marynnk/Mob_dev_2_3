@@ -18,3 +18,18 @@ ion-header ion-toolbar ion-title {
     box-shadow: var(--app-card-shadow);
     padding: 28px 24px;
 }
+
+.field-group {
+    margin-bottom: 4px;
+}
+
+.photos-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--app-text-muted);
+    margin-bottom: 10px;
+    padding-left: 2px;
+}
+.photos {
+    margin-bottom: 20px;
+}

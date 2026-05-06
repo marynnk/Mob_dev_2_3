@@ -256,3 +256,13 @@ ion-fab-button {
     --background: linear-gradient(135deg, var(--app-primary-light), var(--app-primary-dark));
     --box-shadow: 0 6px 20px rgba(108, 99, 255, 0.4);
 }
+
+.date-field ion-datetime-button::part(native-button) {
+    font-size: 15px;
+    font-family: var(--ion-font-family);
+    font-weight: 400;
+    letter-spacing: normal;
+    text-transform: none;
+    min-height: auto;
+    line-height: 1.4;
+}

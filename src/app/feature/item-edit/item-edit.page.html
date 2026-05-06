@@ -25,7 +25,21 @@
                         [errorText]="fieldError('title')"
                         [class.ion-invalid]="fieldInvalid('title')"
                         [class.ion-touched]="form.get('title')?.touched"
-                    ></ion-input>
+                    />
+                </div>
+
+                <div class="field-group">
+                    <ion-input
+                        fill="outline"
+                        type="datetime-local"
+                        label="Кінцева дата"
+                        labelPlacement="stacked"
+                        formControlName="dueDate"
+                        [min]="minDate"
+                        [errorText]="fieldError('dueDate')"
+                        [class.ion-invalid]="fieldInvalid('dueDate')"
+                        [class.ion-touched]="form.get('dueDate')?.touched"
+                    />
                 </div>
 
                 <div class="field-group">
@@ -44,8 +58,23 @@
                     ></ion-textarea>
                 </div>
 
-                <ion-button expand="block" type="submit" class="submit-btn">
-                    <ion-icon slot="start" name="save-outline"></ion-icon>
+                <div class="field-group photos">
+                    <div class="photos-label">Фотографії</div>
+                    <app-photo-grid
+                    [photos]="photos"
+                    [pendingPhotos]="pendingPhotos"
+                    (openPhoto)="openPhoto($event)"
+                    (addPhoto)="addPhoto($event)"
+                    (removeNewPhoto)="removePendingPhoto($event)"
+                    (removeExistingPhoto)="removeExistingPhoto($event)"/>
+                </div>
+
+                <ion-button expand="block" type="submit" class="submit-btn" [disabled]="isSaving">
+                    @if (isSaving) {
+                        <ion-spinner name="crescent" slot="start"></ion-spinner>
+                    } @else {
+                        <ion-icon slot="start" name="save-outline"></ion-icon>
+                    }
                     Зберегти
                 </ion-button>
 
@@ -53,3 +82,5 @@
         </div>
     </div>
 </ion-content>
+
+<app-photo-view [photoUrl]="selectedPhotoUrl!" (closeViewer)="closePhoto()"/>
