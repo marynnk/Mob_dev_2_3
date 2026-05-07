@@ -1,12 +1,10 @@
 <ion-item-sliding #slidingItem>
 
-    @if (!item.completed) {
-        <ion-item-options side="start" (ionSwipe)="handleToggleTask(item, slidingItem)">
-            <ion-item-option expandable (click)="handleToggleTask(item, slidingItem); $event.stopPropagation()">
-                <ion-icon slot="icon-only" name="checkmark-circle"></ion-icon>
-            </ion-item-option>
-        </ion-item-options>
-    }
+    <ion-item-options side="start" (ionSwipe)="handleToggleTask(item, slidingItem)">
+        <ion-item-option expandable (click)="handleToggleTask(item, slidingItem); $event.stopPropagation()">
+            <ion-icon slot="icon-only" name="checkmark-circle"></ion-icon>
+        </ion-item-option>
+    </ion-item-options>
 
     <ion-item [class.task-done]="item.completed" [class.overdue]="isOverdue(item)" (click)="handleEditTask(item)" button detail="false">
         <div slot="start" class="status-dot" [class.done]="item.completed">
